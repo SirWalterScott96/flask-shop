@@ -153,17 +153,18 @@ def admin_create_product(category_id):
     product_form = ProductForm()
 
     if product_form.validate_on_submit():
-        category_id_local = Categories.query.filter_by(id=category_id).first()
-
-        product = Products(name=product_form.name.data,
-                           price=product_form.price.data,
-                           # TODO add normal link to img
-                           img_url=product_form.img_upload.data,
-                           quantity=product_form.quantity.data,
-                           categories_id=category_id_local.id)
-
-        db.session.add(product)
-        db.session.commit()
+        print(product_form.img_upload)
+        # category_id_local = Categories.query.filter_by(id=category_id).first()
+        #
+        # product = Products(name=product_form.name.data,
+        #                    price=product_form.price.data,
+        #                    # TODO add normal link to img
+        #                    img_url=product_form.img_upload.data,
+        #                    quantity=product_form.quantity.data,
+        #                    categories_id=category_id_local.id)
+        #
+        # db.session.add(product)
+        # db.session.commit()
 
         return redirect(url_for('admin'))
     return redirect(url_for('admin'))

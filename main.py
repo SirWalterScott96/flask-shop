@@ -126,6 +126,12 @@ def admin(category_id):
                            category_active=category_active if category_id else None, product_form=product_form)
 
 
+@app.route('/admin-panel/add-admin')
+@only_admin_access
+def add_admin():
+    return render_template('paneladmin-admins.html')
+
+
 @app.route('/admin-login', methods=['GET', 'POST'])
 def admin_login():
     form = AdminLoginForm()

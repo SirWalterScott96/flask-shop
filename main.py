@@ -196,6 +196,19 @@ def admin_create_product():
     return redirect(url_for('admin'))
 
 
+@app.route('/admin-delete-product/<product_id>/<category_id>', methods=['GET', 'POST'])
+@only_admin_access
+def admin_delete_product(product_id, category_id):
+    product_to_delete = Products.query.filter_by(id=product_id).first()
+
+    if product_to_delete:
+        db.session.delete(product_to_delete)
+        db.session.commit()
+
+    return redirect(url_for('admin', category_id=category_id))
+
+
+
 @app.route('/logout')
 def logout():
     logout_user()

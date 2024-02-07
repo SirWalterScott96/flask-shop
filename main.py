@@ -1,23 +1,27 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
 from flask_login import UserMixin, LoginManager, login_user, login_required, current_user, logout_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, IntegerField, FloatField
+from wtforms import StringField, PasswordField, IntegerField, FloatField, HiddenField, TextAreaField
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms.validators import DataRequired
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
 import uuid
+import os
+from PIL import Image
 
 ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg']
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'change_this_string_its_important'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-app.config['UPLOAD_FOLDER'] = '/path/to/the/uploads'
+app.config["UPLOAD_EXTENSIONS"] = ["jpg", "png"]
+app.config['UPLOAD_FOLDER'] = os.path.join(os.path.abspath('static/product_imgs'))
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login_manager = LoginManager(app)
@@ -56,6 +60,7 @@ class Products(db.Model):
     price = db.Column(db.Float, nullable=False)
     img_url = db.Column(db.String(200), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
+    description = db.Column(db.Text)
     categories_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
 
     discount_products = db.relationship('DiscountProducts', backref='products', lazy=True)
@@ -95,9 +100,10 @@ class CategoriesForm(FlaskForm):
 class ProductForm(FlaskForm):
     name = StringField(validators=[DataRequired()])
     price = FloatField(validators=[DataRequired()])
-    img_upload = FileField(validators=[FileRequired(), FileAllowed(ALLOWED_EXTENSIONS, 'Images only')])
+    img_upload = FileField(validators=[FileRequired(), FileAllowed(app.config["UPLOAD_EXTENSIONS"], 'Images only')])
     quantity = IntegerField(validators=[DataRequired()])
-    categories_id = StringField(validators=[DataRequired()])
+    description = TextAreaField()
+    hidden_tag_id = HiddenField()
 
 
 @app.route('/')
@@ -105,13 +111,19 @@ def home():
     return render_template('index.html')
 
 
-@app.route('/admin')
+@app.route('/admin', defaults={'category_id': None})
+@app.route('/admin/<category_id>')
 @only_admin_access
-def admin():
+def admin(category_id):
     categories_form = CategoriesForm()
+    product_form = ProductForm()
+
     categories = Categories.query.all()
-    print(categories)
-    return render_template('admin.html', categories=categories, categories_form=categories_form)
+    if category_id:
+        category_active = Categories.query.filter_by(id=category_id).first()
+
+    return render_template('admin.html', categories=categories, categories_form=categories_form,
+                           category_active=category_active if category_id else None, product_form=product_form)
 
 
 @app.route('/admin-login', methods=['GET', 'POST'])
@@ -147,26 +159,40 @@ def admin_create_category():
     return redirect(url_for('admin'))
 
 
-@app.route('/admin-create-category/<category_id>', methods=['POST'])
+def resize_img(image_path, width=300):
+    with Image.open(image_path) as img:
+        aspect_ratio = img.width / img.height
+        height = int(width / aspect_ratio)
+        img.thumbnail((width, height))
+        img.save(image_path)
+
+
+@app.route('/admin-create-product', methods=['POST'])
 @only_admin_access
-def admin_create_product(category_id):
+def admin_create_product():
     product_form = ProductForm()
 
     if product_form.validate_on_submit():
-        print(product_form.img_upload)
-        # category_id_local = Categories.query.filter_by(id=category_id).first()
-        #
-        # product = Products(name=product_form.name.data,
-        #                    price=product_form.price.data,
-        #                    # TODO add normal link to img
-        #                    img_url=product_form.img_upload.data,
-        #                    quantity=product_form.quantity.data,
-        #                    categories_id=category_id_local.id)
-        #
-        # db.session.add(product)
-        # db.session.commit()
+        tag_id = product_form.hidden_tag_id.data
+        category_id_local = Categories.query.filter_by(id=tag_id).first()
 
-        return redirect(url_for('admin'))
+        image = product_form.img_upload.data
+        image_name = str(uuid.uuid4()) + '_' + secure_filename(image.filename)
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_name)
+        image.save(image_path)
+        resize_img(image_path)
+
+        product = Products(name=product_form.name.data,
+                           price=product_form.price.data,
+                           img_url='product_imgs/{}'.format(image_name),
+                           quantity=product_form.quantity.data,
+                           description=product_form.description.data,
+                           categories_id=category_id_local.id)
+
+        db.session.add(product)
+        db.session.commit()
+
+        return redirect(url_for('admin', category_id=tag_id))
     return redirect(url_for('admin'))
 
 

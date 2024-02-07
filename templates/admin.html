@@ -12,12 +12,18 @@
         <h1>Hi admin!</h1>
         <div class="row">
             <div class="col-2">
+                <h2 class="text-center">Categories</h2>
                 <div class="list-group">
                     {% for category in categories %}
-                      <a href="#" class="list-group-item list-group-item-action">{{ category.name }}</a>
+                        {% if category.id == category_active.id %}
+                            <a href="{{ url_for('admin', category_id=category.id) }}" class="list-group-item list-group-item-action active">{{ category.name }}</a>
+                        {% else %}
+                            <a href="{{ url_for('admin', category_id=category.id) }}" class="list-group-item list-group-item-action">{{ category.name }}</a>
+                        {% endif %}
                     {% endfor %}
                 </div>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">Create Category</button>
+
+                <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#myModal">Create Category</button>
                 <div class="modal" tabindex="-1" id="myModal">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -43,9 +49,56 @@
                     </div>
                 </div>
             </div>
+
+                <!-- Products -->
+            {% if category_active %}
             <div class="col-8">
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal-2">Add Product</button>
+                <div class="modal" tabindex="-1" id="myModal-2">
+
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form action="{{ url_for('admin_create_product') }}" method="post" enctype="multipart/form-data">
+                                {{ product_form.csrf_token }}
+                                {{ product_form.hidden_tag_id(value=category_active.id) }}
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Add Product</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+
+                                <div class="modal-body">
+                                    {{ product_form.name(class="form-control mb-1", placeholder="Enter a product title") }}
+                                    {{ product_form.description(class="form-control mb-1", placeholder="Write a description") }}
+                                    {{ product_form.price(class="form-control mb-1", placeholder="Enter a price") }}
+                                    {{ product_form.quantity(class="form-control mb-1", placeholder="Enter a quantity") }}
+                                    {{ product_form.img_upload(class="form-control") }}
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Add</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="row row-cols-1 row-cols-md-3 g-4 mt-1">
+                {% for product in category_active.products %}
+                    <div class="col">
+                        <div class="card h-100">
+                            <img src="{{ url_for('static', filename=product.img_url) }}" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ product.name }}</h5>
+                                <p class="card-text">{{ product.description }}</p>
+                                <p class="card-text">Product price: {{ product.price }} UAH</p>
+                                <p class="card-text"><small class="text-muted">Quantity: {{ product.quantity }}</small></p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
             </div>
+            {% endif %}
         </div>
     </div>
 </body>

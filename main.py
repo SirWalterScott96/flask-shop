@@ -4,7 +4,7 @@ from flask_migrate import Migrate
 
 from flask_login import UserMixin, LoginManager, login_user, login_required, current_user, logout_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, IntegerField, FloatField, HiddenField, TextAreaField
+from wtforms import StringField, PasswordField, IntegerField, FloatField, HiddenField, TextAreaField, SelectField
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms.validators import DataRequired
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -88,9 +88,10 @@ class User(db.Model, UserMixin):
     active = db.Column(db.Boolean(), default=True)
 
 
-class AdminLoginForm(FlaskForm):
+class AdminRegisterForm(FlaskForm):
     name = StringField(validators=[DataRequired()])
     password = PasswordField(validators=[DataRequired()])
+    role = SelectField(choices=['admin', 'administrator'])
 
 
 class CategoriesForm(FlaskForm):
@@ -126,25 +127,40 @@ def admin(category_id):
                            category_active=category_active if category_id else None, product_form=product_form)
 
 
-@app.route('/admin-panel/add-admin')
+@app.route('/admin-panel/add-admin', methods=['GET', 'POST'])
 @only_admin_access
 def add_admin():
-    return render_template('paneladmin-admins.html')
+    form = AdminRegisterForm()
+    admins = Admin.query.all()
 
-
-@app.route('/admin-login', methods=['GET', 'POST'])
-def admin_login():
-    form = AdminLoginForm()
     if form.validate_on_submit():
-        admin_local = Admin.query.filter_by(name=form.name.data).first()
-        if not admin_local:
-            return redirect(url_for('admin-login'))
 
-        if check_password_hash(admin_local.password, form.password.data):
-            login_user(admin_local)
-            return redirect(url_for('admin'))
+        new_admin = Admin(
+            name=form.name.data,
+            password=generate_password_hash(form.password.data),
+            role=form.role.data
+        )
+        db.session.add(new_admin)
+        db.session.commit()
 
-    return render_template('admin_login.html', form=form)
+        return redirect(url_for('add_admin'))
+    return render_template('paneladmin-admins.html', form=form, admins=admins)
+
+
+# @app.route('/admin-login', methods=['GET', 'POST'])
+# def admin_login():
+#     form = AdminLoginForm()
+#
+#     if form.validate_on_submit():
+#         admin_local = Admin.query.filter_by(name=form.name.data).first()
+#         if not admin_local:
+#             return redirect(url_for('admin-login'))
+#
+#         if check_password_hash(admin_local.password, form.password.data):
+#             login_user(admin_local)
+#             return redirect(url_for('admin'))
+#
+#     return render_template('admin_login.html', form=form)
 
 
 @app.route('/admin-create-category', methods=['POST'])

@@ -33,5 +33,48 @@
         </div>
       </div>
     </nav>
+
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">Add new admin</button>
+    <div class="modal" tabindex="-1" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ url_for('add_admin') }}" method="post">
+                    {{ form.csrf_token }}
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add new admin</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                    {{ form.name(class="form-control",placeholder="Write a name") }}
+                    {{ form.password(class="form-control",placeholder="Write a password") }}
+                    {{ form.role(class="form-select") }}
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Create</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Role</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for admin in admins %}
+        <tr>
+          <td>{{ admin.name }}</td>
+          <td>{{ admin.role }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
 </body>
 </html>

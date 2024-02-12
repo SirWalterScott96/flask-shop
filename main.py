@@ -1,10 +1,10 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-
+from flask_mail import Mail, Message
 from flask_login import UserMixin, LoginManager, login_user, login_required, current_user, logout_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, IntegerField, FloatField, HiddenField, TextAreaField, SelectField
+from wtforms import StringField, PasswordField, IntegerField, FloatField, HiddenField, TextAreaField, EmailField, SelectField
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms.validators import DataRequired
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,15 +12,27 @@ from werkzeug.utils import secure_filename
 from functools import wraps
 import uuid
 import os
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
+from datetime import timedelta
 from PIL import Image
 
 ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg']
+COOKIE_DURATION = timedelta(days=3)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'change_this_string_its_important'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['REMEMBER_COOKIE_DURATION'] = COOKIE_DURATION
 app.config["UPLOAD_EXTENSIONS"] = ["jpg", "png"]
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.abspath('static/product_imgs'))
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'dpfrjyt@gmail.com'
+app.config['MAIL_PASSWORD'] = 'fecosxhkvojaxckt'
+
+serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -44,14 +56,21 @@ def only_admin_access(func):
             return func(*args, **kwargs)
         else:
             return redirect(url_for('admin_login'))
-
     return wrapper
 
 
 class Categories(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    products = db.relationship('Products', backref='categories', lazy=True)
+    sub_category = db.relationship('Subcategory', backref='categories', lazy=True)
+
+
+class Subcategory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
+
+    products = db.relationship('Products', backref='subcategory', lazy=True)
 
 
 class Products(db.Model):
@@ -61,7 +80,8 @@ class Products(db.Model):
     img_url = db.Column(db.String(200), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     description = db.Column(db.Text)
-    categories_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
+
+    subcategory_id = db.Column(db.Integer, db.ForeignKey('subcategory.id'))
 
     discount_products = db.relationship('DiscountProducts', backref='products', lazy=True)
 
@@ -75,6 +95,7 @@ class DiscountProducts(db.Model):
 
 class Admin(db.Model, UserMixin):
     id = db.Column(db.String(50), primary_key=True, default=str(uuid.uuid4()), unique=True)
+    username = db.Column(db.String(100), nullable=False, unique=True)
     name = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(20))
@@ -82,16 +103,30 @@ class Admin(db.Model, UserMixin):
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
     username = db.Column(db.String(50), nullable=False, unique=True)
     email = db.Column(db.String())
     password = db.Column(db.String(100))
-    active = db.Column(db.Boolean(), default=True)
+    email_confirmed = db.Column(db.Boolean(), default=False)
+
+
+class RegisterForm(FlaskForm):
+    name = StringField(validators=[DataRequired()])
+    username = StringField(validators=[DataRequired()])
+    password = PasswordField(validators=[DataRequired()])
+    email = EmailField(validators=[DataRequired()])
 
 
 class AdminRegisterForm(FlaskForm):
     name = StringField(validators=[DataRequired()])
+    username = StringField(validators=[DataRequired()])
     password = PasswordField(validators=[DataRequired()])
-    role = SelectField(choices=['admin', 'administrator'])
+    role = SelectField(['admin', 'administrator'])
+
+
+class LoginForm(FlaskForm):
+    name = StringField(validators=[DataRequired()])
+    password = PasswordField(validators=[DataRequired()])
 
 
 class CategoriesForm(FlaskForm):
@@ -109,7 +144,15 @@ class ProductForm(FlaskForm):
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    categories = Categories.query.all()
+    return render_template('index.html', categories=categories)
+
+
+@app.route('/category/<category_id>')
+def category(category_id):
+    category_local = Categories.query.filter_by(id=category_id).all()
+    print(category_local[0].name)
+    return render_template('category.html', category_local=category_local)
 
 
 @app.route('/admin', defaults={'category_id': None})
@@ -147,20 +190,76 @@ def add_admin():
     return render_template('paneladmin-admins.html', form=form, admins=admins)
 
 
-# @app.route('/admin-login', methods=['GET', 'POST'])
-# def admin_login():
-#     form = AdminLoginForm()
-#
-#     if form.validate_on_submit():
-#         admin_local = Admin.query.filter_by(name=form.name.data).first()
-#         if not admin_local:
-#             return redirect(url_for('admin-login'))
-#
-#         if check_password_hash(admin_local.password, form.password.data):
-#             login_user(admin_local)
-#             return redirect(url_for('admin'))
-#
-#     return render_template('admin_login.html', form=form)
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        username = form.name.data
+
+        if not username.startswith('admin'):
+            user = User.query.filter_by(username=username).first()
+
+            if user and check_password_hash(user.password, form.password.data):
+                login_user(user)
+                return redirect(url_for('home'))
+        elif username.startswith('admin'):
+            admin_local = Admin.query.filter_by(username=username).first()
+
+            if admin_local and check_password_hash(admin_local.username, form.password.data):
+                login_user(admin_local)
+                return redirect(url_for('admin'))
+
+            return redirect(url_for('login'))
+
+    return render_template('login.html', form=form)
+
+
+@app.route('/registration', methods=['GET', 'POST'])
+def registration():
+    form = RegisterForm()
+
+    if form.validate_on_submit():
+        new_user = User(name=form.name.data,
+                        username=form.username.data,
+                        password=generate_password_hash(form.password.data),
+                        email=form.email.data)
+        db.session.add(new_user)
+        db.session.commit()
+        send_confirmation_email(form.email.data, new_user.id)
+
+        flash('A confirmation code has been sent to your email')
+        return redirect(url_for('login'))
+    return render_template('registration.html', form=form)
+
+
+def send_confirmation_email(email, id_user):
+    mail = Mail(app)
+    subject = 'Confirm Your Registration'
+    token = serializer.dumps(email, salt='email-confirm')
+    confirmation_url = url_for('emai_confirm', id=id_user,  token=token,  _external=True)
+    message_body = f'Click the following link to confirm your registration: {confirmation_url}'
+    msg = Message(subject=subject, recipients=[email], body=message_body)
+    mail.send(msg)
+
+
+@app.route('/confirm-email/<id>/<token>')
+def confirm_email(id, token):
+    try:
+        serializer.loads(token, salt='email-confirm', max_age=3600)
+
+        user = User.query.filter_by(id=id).first()
+        user.email_confirmed = True
+        db.session.commit()
+
+        flash('Email is confirmed')
+        return url_for('login')
+    except SignatureExpired:
+        flash('Expired token')
+        return redirect(url_for('login'))
+    except BadSignature:
+        flash('Invalid token')
+        return redirect(url_for('login'))
 
 
 @app.route('/admin-create-category', methods=['POST'])
@@ -226,9 +325,7 @@ def admin_delete_product(product_id, category_id):
     if product_to_delete:
         db.session.delete(product_to_delete)
         db.session.commit()
-
     return redirect(url_for('admin', category_id=category_id))
-
 
 
 @app.route('/logout')

@@ -4,7 +4,8 @@ from flask_migrate import Migrate
 from flask_mail import Mail, Message
 from flask_login import UserMixin, LoginManager, login_user, login_required, current_user, logout_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, IntegerField, FloatField, HiddenField, TextAreaField, EmailField, SelectField
+from wtforms import StringField, PasswordField, IntegerField, FloatField, HiddenField, TextAreaField, EmailField, \
+    SelectField
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms.validators import DataRequired
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -26,6 +27,7 @@ app.config['REMEMBER_COOKIE_DURATION'] = COOKIE_DURATION
 app.config["UPLOAD_EXTENSIONS"] = ["jpg", "png"]
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.abspath('static/product_imgs'))
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_DEFAULT_SENDER'] = ('Flask Shop', 'Flask shop')
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
@@ -55,7 +57,8 @@ def only_admin_access(func):
         if current_user.is_active and uuid.UUID(str(current_user.id)):
             return func(*args, **kwargs)
         else:
-            return redirect(url_for('admin_login'))
+            return redirect(url_for('home'))
+
     return wrapper
 
 
@@ -110,7 +113,7 @@ class User(db.Model, UserMixin):
     email_confirmed = db.Column(db.Boolean(), default=False)
 
 
-class RegisterForm(FlaskForm):
+class UserRegisterForm(FlaskForm):
     name = StringField(validators=[DataRequired()])
     username = StringField(validators=[DataRequired()])
     password = PasswordField(validators=[DataRequired()])
@@ -121,11 +124,16 @@ class AdminRegisterForm(FlaskForm):
     name = StringField(validators=[DataRequired()])
     username = StringField(validators=[DataRequired()])
     password = PasswordField(validators=[DataRequired()])
-    role = SelectField(['admin', 'administrator'])
+    role = SelectField(choices=['admin', 'administrator'])
 
 
-class LoginForm(FlaskForm):
-    name = StringField(validators=[DataRequired()])
+class UserLoginForm(FlaskForm):
+    username = StringField(validators=[DataRequired()])
+    password = PasswordField(validators=[DataRequired()])
+
+
+class AdminLoginForm(FlaskForm):
+    username = StringField(validators=[DataRequired()])
     password = PasswordField(validators=[DataRequired()])
 
 
@@ -151,7 +159,7 @@ def home():
 @app.route('/category/<category_id>')
 def category(category_id):
     category_local = Categories.query.filter_by(id=category_id).all()
-    print(category_local[0].name)
+
     return render_template('category.html', category_local=category_local)
 
 
@@ -177,8 +185,8 @@ def add_admin():
     admins = Admin.query.all()
 
     if form.validate_on_submit():
-
         new_admin = Admin(
+            username=form.username.data,
             name=form.name.data,
             password=generate_password_hash(form.password.data),
             role=form.role.data
@@ -191,35 +199,48 @@ def add_admin():
 
 
 @app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
+def user_login():
+    form = UserLoginForm()
 
     if form.validate_on_submit():
-        username = form.name.data
+        user = User.query.filter_by(username=form.username.data).first()
 
-        if not username.startswith('admin'):
-            user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, form.password.data):
+            if not user.email_confirmed:
+                flash('Confirm your email', 'danger')
+                return redirect(url_for('user_login'))
 
-            if user and check_password_hash(user.password, form.password.data):
-                login_user(user)
-                return redirect(url_for('home'))
-        elif username.startswith('admin'):
-            admin_local = Admin.query.filter_by(username=username).first()
+            login_user(user)
+            return redirect(url_for('home'))
 
-            if admin_local and check_password_hash(admin_local.username, form.password.data):
-                login_user(admin_local)
-                return redirect(url_for('admin'))
-
-            return redirect(url_for('login'))
+        flash('incorrect username or password', 'danger')
+        return redirect(url_for('user_login'))
 
     return render_template('login.html', form=form)
 
 
-@app.route('/registration', methods=['GET', 'POST'])
-def registration():
-    form = RegisterForm()
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    form = AdminLoginForm()
 
     if form.validate_on_submit():
+        admin_to_login = Admin.query.filter_by(username=form.username.data).first()
+        if admin_to_login and check_password_hash(admin_to_login.password, form.password.data):
+            login_user(admin_to_login)
+            return redirect(url_for('admin'))
+
+        flash('incorrect data', 'danger')
+        return redirect(url_for('admin_login'))
+
+    return render_template('admin-login.html', form=form)
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = UserRegisterForm()
+
+    if form.validate_on_submit():
+        # TODO realize if username, write that username is used, ajax
         new_user = User(name=form.name.data,
                         username=form.username.data,
                         password=generate_password_hash(form.password.data),
@@ -228,38 +249,52 @@ def registration():
         db.session.commit()
         send_confirmation_email(form.email.data, new_user.id)
 
-        flash('A confirmation code has been sent to your email')
-        return redirect(url_for('login'))
-    return render_template('registration.html', form=form)
+        flash('A confirmation code has been sent to your email', 'success')
+        return redirect(url_for('user_login'))
+    return render_template('register.html', form=form)
 
 
-def send_confirmation_email(email, id_user):
+@app.route('/resend_confirmation_email/<user_email>/<user_id>', methods=['GET', 'POST'])
+def resend_confirmation_email(user_email, user_id):
+    send_confirmation_email(user_email, user_id)
+
+    flash('A confirmation code has been sent to your email', 'success')
+    return redirect(url_for('user_login'))
+
+
+def send_confirmation_email(user_email, id_user):
     mail = Mail(app)
     subject = 'Confirm Your Registration'
-    token = serializer.dumps(email, salt='email-confirm')
-    confirmation_url = url_for('emai_confirm', id=id_user,  token=token,  _external=True)
-    message_body = f'Click the following link to confirm your registration: {confirmation_url}'
-    msg = Message(subject=subject, recipients=[email], body=message_body)
+    token = serializer.dumps(user_email, salt='email-confirm')
+    confirmation_url = url_for('confirm_email', confirm_id=id_user, token=token, _external=True)
+    message_body = f'Click the following link to confirm your registration: ' \
+                   f'{confirmation_url}'
+    msg = Message(subject=subject, recipients=[user_email], body=message_body)
     mail.send(msg)
 
 
-@app.route('/confirm-email/<id>/<token>')
-def confirm_email(id, token):
+@app.route('/confirm-email/<confirm_id>/<token>')
+def confirm_email(confirm_id, token):
+    # TODO a resend confirmation email
     try:
+        user = User.query.filter_by(id=confirm_id).first()
+        if not user:
+            flash('no user found', 'danger')
+            return redirect(url_for('user_login'))
+
         serializer.loads(token, salt='email-confirm', max_age=3600)
 
-        user = User.query.filter_by(id=id).first()
         user.email_confirmed = True
         db.session.commit()
 
-        flash('Email is confirmed')
-        return url_for('login')
+        flash('Email is confirmed', 'success')
+        return redirect(url_for('user_login'))
     except SignatureExpired:
-        flash('Expired token')
-        return redirect(url_for('login'))
+        flash('Expired token', 'danger')
+        return redirect(url_for('user_login'))
     except BadSignature:
-        flash('Invalid token')
-        return redirect(url_for('login'))
+        flash('Invalid token', 'danger')
+        return redirect(url_for('user_login', user_email=user.email, id_user=user.id))
 
 
 @app.route('/admin-create-category', methods=['POST'])

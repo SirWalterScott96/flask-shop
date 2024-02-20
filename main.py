@@ -168,9 +168,9 @@ def category(category_id):
     return render_template('category.html', category_local=category_local)
 
 
-@app.route('/admin')
-@app.route('/admin/<category_id>')
 @app.route('/admin/<category_id>/<subcategory_id>')
+@app.route('/admin/<category_id>')
+@app.route('/admin')
 @only_admin_access
 def admin(category_id=None, subcategory_id=None):
     categories_form = CategoriesForm()
@@ -178,11 +178,11 @@ def admin(category_id=None, subcategory_id=None):
     sub_categories_form = SubCategoryForm()
 
     categories = Categories.query.all()
-    if category_id:
-        category_active = Categories.query.filter_by(id=category_id).first()
+
+    subcategory_active = Subcategory.query.filter_by(id=subcategory_id).first() if subcategory_id else None
 
     return render_template('admin.html', categories=categories, categories_form=categories_form,
-                           category_active=category_active if category_id else None,
+                           subcategory_active=subcategory_active,
                            product_form=product_form,
                            sub_categories_form=sub_categories_form)
 
@@ -331,21 +331,21 @@ def admin_create_subcategory():
 
     if form.validate_on_submit():
         tag_id = form.hidden_tag_id.data
-        category_id_local = Categories.query.filter_by(id=tag_id).first()
 
         new_subcategory = Subcategory(name=form.name.data,
-                                      category_id=category_id_local.id)
+                                      category_id=tag_id)
         db.session.add(new_subcategory)
         db.session.commit()
 
-        return redirect(url_for('admin', category_id=tag_id))
+        return redirect(url_for('admin', subcategory_id=new_subcategory.id))
     return redirect(url_for('admin'))
 
 
-def resize_img(image_path, width=300):
+def resize_img(image_path):
+    height = 230
     with Image.open(image_path) as img:
         aspect_ratio = img.width / img.height
-        height = int(width / aspect_ratio)
+        width = int(height / aspect_ratio)
         img.thumbnail((width, height))
         img.save(image_path)
 
@@ -357,7 +357,7 @@ def admin_create_product():
 
     if product_form.validate_on_submit():
         tag_id = product_form.hidden_tag_id.data
-        category_id_local = Categories.query.filter_by(id=tag_id).first()
+        category_id_local = Subcategory.query.filter_by(id=tag_id).first()
 
         image = product_form.img_upload.data
         image_name = str(uuid.uuid4()) + '_' + secure_filename(image.filename)
@@ -370,24 +370,24 @@ def admin_create_product():
                            img_url='product_imgs/{}'.format(image_name),
                            quantity=product_form.quantity.data,
                            description=product_form.description.data,
-                           categories_id=category_id_local.id)
+                           subcategory_id=category_id_local.id)
 
         db.session.add(product)
         db.session.commit()
 
-        return redirect(url_for('admin', category_id=tag_id))
+        return redirect(url_for('admin'))
     return redirect(url_for('admin'))
 
 
-@app.route('/admin-delete-product/<product_id>/<category_id>', methods=['GET', 'POST'])
+@app.route('/admin-delete-product/<product_id>/<subcategory_id>/<category_id>', methods=['GET', 'POST'])
 @only_admin_access
-def admin_delete_product(product_id, category_id):
+def admin_delete_product(product_id, subcategory_id, category_id):
     product_to_delete = Products.query.filter_by(id=product_id).first()
 
     if product_to_delete:
         db.session.delete(product_to_delete)
         db.session.commit()
-    return redirect(url_for('admin', category_id=category_id))
+    return redirect(url_for('admin', category_id=category_id, subcategory_id=subcategory_id))
 
 
 @app.route('/logout')

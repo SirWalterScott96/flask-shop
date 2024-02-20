@@ -1,3 +1,6 @@
+/*Main Color: color: rgb(10, 173, 10);*/
+
+
 .btn-close {
     background-color: transparent;
     border: 0;
@@ -6,4 +9,73 @@
     position: absolute;
     right: 2px;
     top: 5px;
+}
+
+.list-group-item {
+    border: none;
+
+}
+
+.list-group .list-group-item {
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+}
+
+.item-color{
+    background-color: red;
+}
+
+.category-link {
+    font-size: 22px;
+    text-decoration: none;
+    color: black;
+}
+
+.category-link-small {
+    font-size: 18px;
+    text-decoration: none;
+    color: black;
+}
+
+.category-link:hover,
+.category-link-small:hover {
+    color: rgb(10, 173, 10);
+}
+
+.category-link-small:hover {
+    color: rgb(10, 173, 10);
+}
+
+.btn-color-green{
+    background-color: rgb(10, 173, 10);
+    color: #fff;
+}
+
+.btn{
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-color-green:hover {
+    color: #fff;
+    background-color: rgb(9, 151, 9);
+}
+
+.color-active{
+    color: rgb(10, 173, 10);
+
+}
+
+.card {
+    transition: all 0.3s;
+    border-radius: 0.5rem !important;
+}
+
+.card:hover {
+    border-color: rgb(10, 173, 10);
+}
+
+.card-img {
+    width: auto;
 }

@@ -4,23 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.8/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<style>
-    .list-group-item {
-      border: none;
-    }
-
-    .list-group .list-group-item {
-      border-left: none;
-      border-right: none;
-      border-radius: 0;
-    }
-  </style>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 <!--  Navbar  -->
@@ -43,87 +31,105 @@
     </div>
 </nav>
 
+<div class="modal" tabindex="-1" id="myModal-2">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form action="{{ url_for('admin_create_category') }}" method="post">
+                {{ categories_form.csrf_token }}
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    {{ categories_form.name(class="form-control",placeholder="Enter a title") }}
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-color-green">Create</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 <div class="container">
     <h1>Hi {{ current_user.name }}!</h1>
     <div class="row">
-        <div class="col-2">
-            <h2 class="text-center">Categories</h2>
-            <ul class="list-group">
+        <div class="col-3">
+            <h3 class="">Categories</h3>
+            <ul class="nav nav-category">
                 {% for category in categories %}
-                    <li class="list-group-item">
+                    <li class="nav-item border-bottom w-100 mb-1">
                         <div class="d-flex justify-content-between align-items-center ">
-                        <a href="#" class="category-link">{{ category.name }}</a>
-                        <i class="toggle-icon fas fa-chevron-down" data-toggle="collapse" data-target="#subCatalog{{ category.id }}" aria-expanded="true" aria-controls="subCatalog{{ category.id }}" style="cursor: pointer"></i>
+                            <a href="#" class="category-link">{{ category.name }}</a>
+                            <i class="toggle-icon fas fa-chevron-down" data-bs-toggle="collapse" data-bs-target="#category-{{ category.id }}" style="cursor: pointer"></i>
                         </div>
-                        <ul class="list-group collapse" id="subCatalog{{ category.id }}">
-                            {% for subcategory in category.sub_category %}
-                                <li class="list-group-item">{{ subcategory.name }}</li>
-                            {% endfor %}
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal-{{ category.id }}">Add new</button>
-                            <div class="modal" tabindex="-1" id="myModal-{{ category.id }}">
 
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <form action="{{ url_for('admin_create_subcategory') }}" method="post">
-                                            {{ sub_categories_form.csrf_token }}
-                                            {{ sub_categories_form.hidden_tag_id(value=category.id) }}
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Create Subcategory</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
+                        {% if category.id == subcategory_active.category_id %}
+                            <ul class="list-group collapse show" id="category-{{ category.id }}">
+                        {% else %}
+                            <ul class="list-group collapse" id="category-{{ category.id }}">
+                        {% endif %}
 
-                                            <div class="modal-body">
-                                                {{ product_form.name(class="form-control mb-1", placeholder="Enter a subcategories title") }}
-                                            </div>
+                        {% for subcategory in category.sub_category %}
+                            {% if subcategory.id == subcategory_active.id %}
+                                <div class="list-group-item link-weight border-bottom"><a href="{{ url_for('admin', category_id=category.id, subcategory_id=subcategory.id) }}" class="category-link-small color-active">{{ subcategory.name }}</a></div>
+                            {% else %}
+                                <div class="list-group-item link-weight border-bottom"><a href="{{ url_for('admin', category_id=category.id, subcategory_id=subcategory.id) }}" class="category-link-small">{{ subcategory.name }}</a></div>
+                            {% endif %}
 
-                                            <div class="modal-footer">
-                                                <button type="submit" class="btn btn-primary">Create</button>
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
+                        {% endfor %}
+
+                        <button type="button" class="btn btn-color-green mt-3" data-bs-toggle="modal" data-bs-target="#myModal-sub-{{ category.id }}">Add new</button>
                         </ul>
                     </li>
+
+                    <div class="modal" tabindex="-1" id="myModal-sub-{{ category.id }}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form action="{{ url_for('admin_create_subcategory') }}" method="post">
+                                    {{ sub_categories_form.csrf_token }}
+                                    {{ sub_categories_form.hidden_tag_id(value=category.id) }}
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Create Subcategory</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        {{ product_form.name(class="form-control mb-1", placeholder="Enter a subcategories title") }}
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-color-green">Create</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 {% endfor %}
             </ul>
-            <div class="d-grid">
-                <button type="button" class="btn btn-primary mt-3 justify-content-center" data-bs-toggle="modal" data-bs-target="#myModal">Create Category</button>
-            </div>
-            <div class="modal" tabindex="-1" id="myModal">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form action="{{ url_for('admin_create_category') }}" method="post">
-                            {{ categories_form.csrf_token }}
-                            <div class="modal-header">
-                                <h5 class="modal-title">Create Category</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                {{ categories_form.name(class="form-control",placeholder="Enter a title") }}
-                            </div>
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Create</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+
+            <div class="d-grid justify-content-center mt-3">
+                <button type="button" class="btn btn-color-green justify-content-center" data-bs-toggle="modal" data-bs-target="#myModal-2">Create Category</button>
             </div>
         </div>
 
         <!-- Products -->
-        {% if category_active %}
+        {% if subcategory_active %}
             <div class="col-8">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal-2">Add Product</button>
-                <div class="modal" tabindex="-1" id="myModal-2">
-
+                <button type="button" class="btn btn-color-green" data-bs-toggle="modal" data-bs-target="#myModal-3">Add Product</button>
+                <div class="modal" tabindex="-1" id="myModal-3">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <form action="{{ url_for('admin_create_product') }}" method="post" enctype="multipart/form-data">
                                 {{ product_form.csrf_token }}
-                                {{ product_form.hidden_tag_id(value=category_active.id) }}
+                                {{ product_form.hidden_tag_id(value=subcategory_active.id) }}
                                 <div class="modal-header">
                                     <h5 class="modal-title">Add Product</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -138,7 +144,7 @@
                                 </div>
 
                                 <div class="modal-footer">
-                                    <button type="submit" class="btn btn-primary">Add</button>
+                                    <button type="submit" class="btn btn-color-green">Add</button>
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                 </div>
                             </form>
@@ -148,11 +154,14 @@
 
                 <!-- Card -->
                 <div class="row row-cols-1 row-cols-md-3 g-4 mt-1">
-                    {% for product in category_active.products %}
-                        <div class="col">
-                            <div class="card h-100">
-                                <img src="{{ url_for('static', filename=product.img_url) }}" alt="...">
-                                <a class="button btn-close" href="{{ url_for('admin_delete_product', product_id=product.id, category_id=category_active.id) }}"></a>
+                    {% for product in subcategory_active.products %}
+
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="row justify-content-center align-items-center">
+                                    <img src="{{ url_for('static', filename=product.img_url) }}" class="mt-2 card-img img-fluid" alt="...">
+                                </div>
+                                <a class="button btn-close" href="{{ url_for('admin_delete_product', product_id=product.id, subcategory_id=subcategory_active.id, category_id=subcategory_active.category_id) }}"></a>
                                 <div class="card-body">
                                     <h5 class="card-title">{{ product.name }}</h5>
                                     <p class="card-text">{{ product.description }}</p>
@@ -167,14 +176,5 @@
         {% endif %}
     </div>
 </div>
-
-<script>
-  $(document).ready(function(){
-    $(".toggle-icon").click(function(){
-      $(this).toggleClass("fa-chevron-up fa-chevron-down");
-    });
-  });
-</script>
-
 </body>
 </html>

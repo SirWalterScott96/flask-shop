@@ -350,9 +350,9 @@ def resize_img(image_path):
         img.save(image_path)
 
 
-@app.route('/admin-create-product', methods=['POST'])
+@app.route('/admin-create-product/<category_id>/<subcategory_id>', methods=['POST'])
 @only_admin_access
-def admin_create_product():
+def admin_create_product(category_id, subcategory_id):
     product_form = ProductForm()
 
     if product_form.validate_on_submit():
@@ -375,13 +375,13 @@ def admin_create_product():
         db.session.add(product)
         db.session.commit()
 
-        return redirect(url_for('admin'))
+        return redirect(url_for('admin', category_id=category_id, subcategory_id=subcategory_id))
     return redirect(url_for('admin'))
 
 
-@app.route('/admin-delete-product/<product_id>/<subcategory_id>/<category_id>', methods=['GET', 'POST'])
+@app.route('/admin-delete-product/<product_id>/<category_id>/<subcategory_id>')
 @only_admin_access
-def admin_delete_product(product_id, subcategory_id, category_id):
+def admin_delete_product(product_id, category_id, subcategory_id):
     product_to_delete = Products.query.filter_by(id=product_id).first()
 
     if product_to_delete:

@@ -4,81 +4,117 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<style>
+    .list-group-item {
+      border: none;
+    }
+
+    .list-group .list-group-item {
+      border-left: none;
+      border-right: none;
+      border-radius: 0;
+    }
+  </style>
 </head>
 <body>
-    <!--  Navbar  -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container-fluid">
+<!--  Navbar  -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
         <a class="navbar-brand" href="#">Admin Panel</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="{{ url_for('admin') }}">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" href="{{ url_for('add_admin') }}">Admins</a>
-            </li>
-{#            <li class="nav-item">#}
-{#              <a class="nav-link" href="#">Pricing</a>#}
-{#            </li>#}
-{#            <li class="nav-item">#}
-{#              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>#}
-{#            </li>#}
-          </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="{{ url_for('admin') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('add_admin') }}">Admins</a>
+                </li>
+            </ul>
         </div>
-      </div>
-    </nav>
+    </div>
+</nav>
 
-    <div class="container">
-        <h1>Hi admin!</h1>
-        <div class="row">
-            <div class="col-2">
-                <h2 class="text-center">Categories</h2>
-                <div class="list-group">
-                    {% for category in categories %}
-                        {% if category.id == category_active.id %}
-                            <a href="{{ url_for('admin', category_id=category.id) }}" class="list-group-item list-group-item-action active">{{ category.name }}</a>
-                        {% else %}
-                            <a href="{{ url_for('admin', category_id=category.id) }}" class="list-group-item list-group-item-action">{{ category.name }}</a>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-
-                <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#myModal">Create Category</button>
-                <div class="modal" tabindex="-1" id="myModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <form action="{{ url_for('admin_create_category') }}" method="post">
-                                {{ categories_form.csrf_token }}
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Create Category</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-
-
-                                <div class="modal-body">
-                                    {{ categories_form.name(class="form-control",placeholder="Enter a title") }}
-                                </div>
-
-
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn-primary">Create</button>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                </div>
-                            </form>
+<div class="container">
+    <h1>Hi {{ current_user.name }}!</h1>
+    <div class="row">
+        <div class="col-2">
+            <h2 class="text-center">Categories</h2>
+            <ul class="list-group">
+                {% for category in categories %}
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center ">
+                        <a href="#" class="category-link">{{ category.name }}</a>
+                        <i class="toggle-icon fas fa-chevron-down" data-toggle="collapse" data-target="#subCatalog{{ category.id }}" aria-expanded="true" aria-controls="subCatalog{{ category.id }}" style="cursor: pointer"></i>
                         </div>
+                        <ul class="list-group collapse" id="subCatalog{{ category.id }}">
+                            {% for subcategory in category.sub_category %}
+                                <li class="list-group-item">{{ subcategory.name }}</li>
+                            {% endfor %}
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal-{{ category.id }}">Add new</button>
+                            <div class="modal" tabindex="-1" id="myModal-{{ category.id }}">
+
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form action="{{ url_for('admin_create_subcategory') }}" method="post">
+                                            {{ sub_categories_form.csrf_token }}
+                                            {{ sub_categories_form.hidden_tag_id(value=category.id) }}
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Create Subcategory</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+
+                                            <div class="modal-body">
+                                                {{ product_form.name(class="form-control mb-1", placeholder="Enter a subcategories title") }}
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-primary">Create</button>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+            <div class="d-grid">
+                <button type="button" class="btn btn-primary mt-3 justify-content-center" data-bs-toggle="modal" data-bs-target="#myModal">Create Category</button>
+            </div>
+            <div class="modal" tabindex="-1" id="myModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{{ url_for('admin_create_category') }}" method="post">
+                            {{ categories_form.csrf_token }}
+                            <div class="modal-header">
+                                <h5 class="modal-title">Create Category</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                {{ categories_form.name(class="form-control",placeholder="Enter a title") }}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Create</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
+        </div>
 
-                <!-- Products -->
-            {% if category_active %}
+        <!-- Products -->
+        {% if category_active %}
             <div class="col-8">
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal-2">Add Product</button>
                 <div class="modal" tabindex="-1" id="myModal-2">
@@ -112,24 +148,33 @@
 
                 <!-- Card -->
                 <div class="row row-cols-1 row-cols-md-3 g-4 mt-1">
-                {% for product in category_active.products %}
-                    <div class="col">
-                        <div class="card h-100">
-                            <img src="{{ url_for('static', filename=product.img_url) }}" alt="...">
-                            <a class="button btn-close" href="{{ url_for('admin_delete_product', product_id=product.id, category_id=category_active.id) }}"></a>
-                            <div class="card-body">
-                                <h5 class="card-title">{{ product.name }}</h5>
-                                <p class="card-text">{{ product.description }}</p>
-                                <p class="card-text">Product price: {{ product.price }} UAH</p>
-                                <p class="card-text"><small class="text-muted">Quantity: {{ product.quantity }}</small></p>
+                    {% for product in category_active.products %}
+                        <div class="col">
+                            <div class="card h-100">
+                                <img src="{{ url_for('static', filename=product.img_url) }}" alt="...">
+                                <a class="button btn-close" href="{{ url_for('admin_delete_product', product_id=product.id, category_id=category_active.id) }}"></a>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ product.name }}</h5>
+                                    <p class="card-text">{{ product.description }}</p>
+                                    <p class="card-text">Product price: {{ product.price }} UAH</p>
+                                    <p class="card-text"><small class="text-muted">Quantity: {{ product.quantity }}</small></p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
                 </div>
             </div>
-            {% endif %}
-        </div>
+        {% endif %}
     </div>
+</div>
+
+<script>
+  $(document).ready(function(){
+    $(".toggle-icon").click(function(){
+      $(this).toggleClass("fa-chevron-up fa-chevron-down");
+    });
+  });
+</script>
+
 </body>
 </html>

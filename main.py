@@ -141,6 +141,11 @@ class CategoriesForm(FlaskForm):
     name = StringField(validators=[DataRequired()])
 
 
+class SubCategoryForm(FlaskForm):
+    name = StringField(validators=[DataRequired()])
+    hidden_tag_id = HiddenField()
+
+
 class ProductForm(FlaskForm):
     name = StringField(validators=[DataRequired()])
     price = FloatField(validators=[DataRequired()])
@@ -163,19 +168,23 @@ def category(category_id):
     return render_template('category.html', category_local=category_local)
 
 
-@app.route('/admin', defaults={'category_id': None})
+@app.route('/admin')
 @app.route('/admin/<category_id>')
+@app.route('/admin/<category_id>/<subcategory_id>')
 @only_admin_access
-def admin(category_id):
+def admin(category_id=None, subcategory_id=None):
     categories_form = CategoriesForm()
     product_form = ProductForm()
+    sub_categories_form = SubCategoryForm()
 
     categories = Categories.query.all()
     if category_id:
         category_active = Categories.query.filter_by(id=category_id).first()
 
     return render_template('admin.html', categories=categories, categories_form=categories_form,
-                           category_active=category_active if category_id else None, product_form=product_form)
+                           category_active=category_active if category_id else None,
+                           product_form=product_form,
+                           sub_categories_form=sub_categories_form)
 
 
 @app.route('/admin-panel/add-admin', methods=['GET', 'POST'])
@@ -304,7 +313,7 @@ def admin_create_category():
     categories_form = CategoriesForm()
 
     if categories_form.validate_on_submit():
-        if Categories.query.filter_by(name=categories_form.name.data):
+        if Categories.query.filter_by(name=categories_form.name.data).first():
             return redirect(url_for('admin'))
 
         new_category = Categories(name=categories_form.name.data)
@@ -312,6 +321,24 @@ def admin_create_category():
         db.session.commit()
 
         return redirect(url_for('admin'))
+    return redirect(url_for('admin'))
+
+
+@app.route('/admin-create-subcategory', methods=['POST'])
+@only_admin_access
+def admin_create_subcategory():
+    form = SubCategoryForm()
+
+    if form.validate_on_submit():
+        tag_id = form.hidden_tag_id.data
+        category_id_local = Categories.query.filter_by(id=tag_id).first()
+
+        new_subcategory = Subcategory(name=form.name.data,
+                                      category_id=category_id_local.id)
+        db.session.add(new_subcategory)
+        db.session.commit()
+
+        return redirect(url_for('admin', category_id=tag_id))
     return redirect(url_for('admin'))
 
 

@@ -3,21 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-      crossorigin="anonymous"
-    />
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-      crossorigin="anonymous"
-    ></script>
 <body>
                     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid d-flex flex-column">
         <div class="container text-center">
           <div class="row">
@@ -122,27 +116,48 @@
       </div>
     </nav>
 
-<!-- Cards -->
-    <div class="row row-cols-1 row-cols-md-2 g-4">
-    {% for category in category_local %}
-        {% for product in category.products %}
-            <div class="col">
-              <div class="card h-100">
-                <img src="{{ url_for('static', filename=product.img_url) }}" class="card-img-top" alt="..." width="300px">
-                <div class="card-body">
-                  <h5 class="card-title">{{ product.name }}</h5>
-                  <p class="card-text">{{ product.description }}</p>
-                  <p class="card-text">Quantity: {{ product.quantity }}</p>
-                  <p class="card-text">Product price: {{ product.price }} UAH</p>
-                </div>
-                <div class="card-footer">
-                  <small class="text-muted">Last updated 3 mins ago</small>
-                </div>
-              </div>
-            </div>
-        {% endfor %}
-    {% endfor %}
-    </div>
+<div class="container">
+    <div class="row">
+        <div class="col-3">
+            <ul class="nav nav-category">
+                {% for category in categories %}
+                    <li class="nav-item border-bottom w-100 mb-1">
+                        <div class="d-flex justify-content-between align-items-center ">
+                            <a href="{{ url_for('category', category_id=category.id) }}" class="category-link">{{ category.name }}</a>
+                            <i class="toggle-icon fas fa-chevron-down" data-bs-toggle="collapse" data-bs-target="#category-{{ category.id }}" style="cursor: pointer"></i>
+                        </div>
+                        {% if category.id == category_id %}
+                            <ul class="list-group collapse show" id="category-{{ category.id }}">
+                        {% else %}
 
+                            <ul class="list-group collapse" id="category-{{ category.id }}">
+                        {% endif %}
+
+                        {% for subcategory in category.sub_category %}
+{#                            {% if subcategory.id == subcategory_active.id %}#}
+{#                                <div class="list-group-item link-weight border-bottom"><a href="{{ url_for('admin', category_id=category.id, subcategory_id=subcategory.id) }}" class="category-link-small color-active">{{ subcategory.name }}</a></div>#}
+{#                            {% else %}#}
+                                <div class="list-group-item link-weight border-bottom"><a href="{{ url_for('admin', category_id=category.id, subcategory_id=subcategory.id) }}" class="category-link-small">{{ subcategory.name }}</a></div>
+{#                            {% endif %}#}
+                        {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Cards -->
+        <div class="col-8">
+            <div class="row row-cols-1 row-cols-md-3 g-4 mt-1">
+                <div class="col-md-4">
+                    <div class="card-subcategory" >
+                        <img src="/static/alcohol.png" class="img-fluid mb-2" alt="...">
+                        <h5 class="card-title" style="text-align: center">Card title</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

@@ -1,11 +1,12 @@
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, \
+    json, jsonify, session, make_response, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_mail import Mail, Message
 from flask_login import UserMixin, LoginManager, login_user, login_required, current_user, logout_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, IntegerField, FloatField, HiddenField, TextAreaField, EmailField, \
-    SelectField
+    SelectField, SubmitField
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms.validators import DataRequired
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -16,6 +17,8 @@ import os
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 from datetime import timedelta
 from PIL import Image
+from flask.cli import with_appcontext
+from getpass import getpass
 
 ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg']
 COOKIE_DURATION = timedelta(days=3)
@@ -25,7 +28,8 @@ app.config['SECRET_KEY'] = 'change_this_string_its_important'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['REMEMBER_COOKIE_DURATION'] = COOKIE_DURATION
 app.config["UPLOAD_EXTENSIONS"] = ["jpg", "png"]
-app.config['UPLOAD_FOLDER'] = os.path.join(os.path.abspath('static/product_imgs'))
+app.config['UPLOAD_FOLDER_PRODUCT_IMGS'] = os.path.join(os.path.abspath('static/product_imgs'))
+app.config['UPLOAD_FOLDER_SUBCATEGORY_IMGS'] = os.path.join(os.path.abspath('static/subcategory_imgs'))
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_DEFAULT_SENDER'] = ('Flask Shop', 'Flask shop')
 app.config['MAIL_PORT'] = 587
@@ -72,6 +76,7 @@ class Subcategory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
+    img_url = db.Column(db.String(200), nullable=False)
 
     products = db.relationship('Products', backref='subcategory', lazy=True)
 
@@ -88,6 +93,18 @@ class Products(db.Model):
 
     discount_products = db.relationship('DiscountProducts', backref='products', lazy=True)
 
+    def update_from_json(self, data: dict):
+        if 'card-name' in data:
+            self.name = data['card-name']
+        if 'card-price' in data:
+            self.price = data['card-price']
+        if 'card-quantity' in data:
+            self.quantity = data['card-quantity']
+        if 'card-description' in data:
+            self.description = data['card-description']
+
+        db.session.commit()
+
 
 class DiscountProducts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -102,6 +119,37 @@ class Admin(db.Model, UserMixin):
     name = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(20))
+
+    @staticmethod
+    def does_exist_admin():
+        is_admin_exist = Admin.query.filter_by(role='admin').all()
+        return is_admin_exist
+
+    @staticmethod
+    def create_admin(name: str, username: str, password: str):
+        new_admin = Admin(name=name,
+                          username=username,
+                          password=generate_password_hash(password),
+                          role='admin')
+
+        db.session.add(new_admin)
+        db.session.commit()
+
+    @staticmethod
+    @app.cli.command(name='init_admin')
+    @with_appcontext
+    def init_admin():
+        if not Admin.does_exist_admin():
+            print('Creating new admin')
+            name: str = str(input('Enter your name: '))
+            username: str = str(input('Enter your username: '))
+            password: str = getpass('Enter your password: ')
+
+            Admin.create_admin(name, username, password)
+
+            print('The admin is initialized.')
+        else:
+            print('Admin already exist')
 
 
 class User(db.Model, UserMixin):
@@ -143,6 +191,7 @@ class CategoriesForm(FlaskForm):
 
 class SubCategoryForm(FlaskForm):
     name = StringField(validators=[DataRequired()])
+    img_upload = FileField(validators=[FileRequired(), FileAllowed(app.config["UPLOAD_EXTENSIONS"], 'Images only')])
     hidden_tag_id = HiddenField()
 
 
@@ -163,13 +212,11 @@ def home():
 
 @app.route('/category/<category_id>')
 def category(category_id):
-    category_local = Categories.query.filter_by(id=category_id).all()
+    category_local = Categories.query.all()
+    return render_template('category.html', categories=category_local, category_id=int(category_id))
 
-    return render_template('category.html', category_local=category_local)
 
-
-@app.route('/admin/<category_id>/<subcategory_id>')
-@app.route('/admin/<category_id>')
+@app.route('/admin/category-<category_id>/<subcategory_id>')
 @app.route('/admin')
 @only_admin_access
 def admin(category_id=None, subcategory_id=None):
@@ -178,13 +225,28 @@ def admin(category_id=None, subcategory_id=None):
     sub_categories_form = SubCategoryForm()
 
     categories = Categories.query.all()
-
     subcategory_active = Subcategory.query.filter_by(id=subcategory_id).first() if subcategory_id else None
 
-    return render_template('admin.html', categories=categories, categories_form=categories_form,
-                           subcategory_active=subcategory_active,
-                           product_form=product_form,
-                           sub_categories_form=sub_categories_form)
+    response = make_response(render_template('admin.html', categories=categories, categories_form=categories_form,
+                                             subcategory_active=subcategory_active,
+                                             product_form=product_form,
+                                             sub_categories_form=sub_categories_form))
+    response.set_cookie('admin_id', '5000', max_age=3600)
+    return response
+
+
+@app.route('/admin/category-<category_id>')
+@only_admin_access
+def admin_show_subcategories(category_id):
+    categories_form = CategoriesForm()
+    sub_categories_form = SubCategoryForm()
+
+    categories = Categories.query.all()
+    subcategories_in_category = Categories.query.filter_by(id=category_id).first()
+
+    return render_template('admin-category.html', categories=categories,
+                           sub_categories_form=sub_categories_form,
+                           categories_form=categories_form, subcategories_in_category=subcategories_in_category)
 
 
 @app.route('/admin-panel/add-admin', methods=['GET', 'POST'])
@@ -328,12 +390,17 @@ def admin_create_category():
 @only_admin_access
 def admin_create_subcategory():
     form = SubCategoryForm()
-
     if form.validate_on_submit():
         tag_id = form.hidden_tag_id.data
+        image = form.img_upload.data
+        image_name = str(uuid.uuid4()) + '_' + secure_filename(image.filename)
+        image_path = os.path.join(app.config['UPLOAD_FOLDER_SUBCATEGORY_IMGS'], image_name)
+        image.save(image_path)
 
         new_subcategory = Subcategory(name=form.name.data,
-                                      category_id=tag_id)
+                                      category_id=tag_id,
+                                      img_url='subcategory_imgs/{}'.format(image_name))
+
         db.session.add(new_subcategory)
         db.session.commit()
 
@@ -361,7 +428,7 @@ def admin_create_product(category_id, subcategory_id):
 
         image = product_form.img_upload.data
         image_name = str(uuid.uuid4()) + '_' + secure_filename(image.filename)
-        image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_name)
+        image_path = os.path.join(app.config['UPLOAD_FOLDER_PRODUCT_IMGS'], image_name)
         image.save(image_path)
         resize_img(image_path)
 
@@ -377,6 +444,22 @@ def admin_create_product(category_id, subcategory_id):
 
         return redirect(url_for('admin', category_id=category_id, subcategory_id=subcategory_id))
     return redirect(url_for('admin'))
+
+
+@app.route('/edit_product', methods=['POST'])
+def edit_product():
+    header_validation = request.headers.get('Admin-Ajax-Id')
+
+    if not header_validation:
+        abort(403)
+
+    data = request.get_json()
+    product_to_edit = Products.query.filter_by(id=data['product_id']).first()
+
+    if product_to_edit:
+        product_to_edit.update_from_json(data)
+
+    return jsonify({'status': 'success', 'message': 'Saved!'})
 
 
 @app.route('/admin-delete-product/<product_id>/<category_id>/<subcategory_id>')

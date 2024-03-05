@@ -216,19 +216,17 @@ def category(category_id):
     return render_template('category.html', categories=category_local, category_id=int(category_id))
 
 
-@app.route('/admin/category-<category_id>/<subcategory_id>')
 @app.route('/admin')
 @only_admin_access
-def admin(category_id=None, subcategory_id=None):
+def admin():
     categories_form = CategoriesForm()
     product_form = ProductForm()
     sub_categories_form = SubCategoryForm()
 
     categories = Categories.query.all()
-    subcategory_active = Subcategory.query.filter_by(id=subcategory_id).first() if subcategory_id else None
 
-    response = make_response(render_template('admin.html', categories=categories, categories_form=categories_form,
-                                             subcategory_active=subcategory_active,
+    response = make_response(render_template('admin.html', categories=categories,
+                                             categories_form=categories_form,
                                              product_form=product_form,
                                              sub_categories_form=sub_categories_form))
     response.set_cookie('admin_id', '5000', max_age=3600)
@@ -240,13 +238,34 @@ def admin(category_id=None, subcategory_id=None):
 def admin_show_subcategories(category_id):
     categories_form = CategoriesForm()
     sub_categories_form = SubCategoryForm()
+    product_form = ProductForm()
 
     categories = Categories.query.all()
     subcategories_in_category = Categories.query.filter_by(id=category_id).first()
 
     return render_template('admin-category.html', categories=categories,
                            sub_categories_form=sub_categories_form,
-                           categories_form=categories_form, subcategories_in_category=subcategories_in_category)
+                           categories_form=categories_form,
+                           subcategories_in_category=subcategories_in_category)
+
+
+@app.route('/admin/category-<category_id>/subcategory-<subcategory_id>')
+@only_admin_access
+def admin_show_products(category_id, subcategory_id):
+    categories_form = CategoriesForm()
+    sub_categories_form = SubCategoryForm()
+    product_form = ProductForm()
+
+    categories = Categories.query.all()
+    sub_category_active = Subcategory.query.filter_by(id=subcategory_id).first()
+
+    return render_template('admin_category_subcategory_product.html', categories_form=categories_form,
+                           sub_categories_form=sub_categories_form,
+                           product_form=product_form,
+                           categories=categories,
+                           sub_category_active=sub_category_active,
+                           category_id=int(category_id),
+                           subcategory_id=int(subcategory_id))
 
 
 @app.route('/admin-panel/add-admin', methods=['GET', 'POST'])
@@ -442,8 +461,8 @@ def admin_create_product(category_id, subcategory_id):
         db.session.add(product)
         db.session.commit()
 
-        return redirect(url_for('admin', category_id=category_id, subcategory_id=subcategory_id))
-    return redirect(url_for('admin'))
+        return redirect(url_for('admin_show_products', category_id=category_id, subcategory_id=subcategory_id))
+    return redirect(url_for('admin_show_products'))
 
 
 @app.route('/edit_product', methods=['POST'])
@@ -470,7 +489,7 @@ def admin_delete_product(product_id, category_id, subcategory_id):
     if product_to_delete:
         db.session.delete(product_to_delete)
         db.session.commit()
-    return redirect(url_for('admin', category_id=category_id, subcategory_id=subcategory_id))
+    return redirect(url_for('admin_show_products', category_id=category_id, subcategory_id=subcategory_id))
 
 
 @app.route('/logout')

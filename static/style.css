@@ -111,3 +111,13 @@
   border-radius: 0.5rem;
 }
 
+.product-link {
+  /*display: inline-block;*/
+  text-decoration: none;
+  color: #212529;
+}
+
+.product-link:hover {
+  color: #212529;
+}
+

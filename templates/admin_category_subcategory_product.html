@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+<!--  Navbar  -->
+<nav class="navbar navbar-expand-lg navbar-dark green-color">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Admin Panel</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="{{ url_for('admin') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('add_admin') }}">Admins</a>
+                </li>
+            </ul>
+        </div>
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="{{ url_for('logout') }}">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="modal" tabindex="-1" id="myModal-2">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form action="{{ url_for('admin_create_category') }}" method="post">
+                {{ categories_form.csrf_token }}
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    {{ categories_form.name(class="form-control",placeholder="Enter a title") }}
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-color-green">Create</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <h1>Hi {{ current_user.name }}!</h1>
+    <div class="row">
+        <div class="col-3">
+            <h3 class="">Categories</h3>
+
+        <!-- Nav Bar Left -->
+            <ul class="nav nav-category">
+                {% for category in categories %}
+                    <li class="nav-item border-bottom w-100 mb-1">
+                        <div class="d-flex justify-content-between align-items-center ">
+                            <a href="{{ url_for('admin_show_subcategories', category_id=category.id) }}" class="category-link">{{ category.name }}</a>
+                            <i class="toggle-icon fas fa-chevron-down" data-bs-toggle="collapse" data-bs-target="#category-{{ category.id }}" style="cursor: pointer"></i>
+                        </div>
+
+                        {% if category.id == category_id %}
+                            <ul class="list-group collapse show" id="category-{{ category.id }}">
+                        {% else %}
+                            <ul class="list-group collapse" id="category-{{ category.id }}">
+                        {% endif %}
+
+                        {% for subcategory in category.sub_category %}
+                            {% if subcategory.id == subcategory_id %}
+                                <div class="list-group-item link-weight border-bottom"><a href="{{ url_for('admin_show_products', category_id=subcategory.category_id, subcategory_id=subcategory.id) }}" class="category-link-small color-active">{{ subcategory.name }}</a></div>
+                            {% else %}
+                                <div class="list-group-item link-weight border-bottom"><a href="{{ url_for('admin_show_products', category_id=subcategory.category_id, subcategory_id=subcategory.id) }}" class="category-link-small">{{ subcategory.name }}</a></div>
+                            {% endif %}
+
+                        {% endfor %}
+
+                        <button type="button" class="btn btn-color-green mt-3" data-bs-toggle="modal" data-bs-target="#myModal-sub-{{ category.id }}">Add new</button>
+                        </ul>
+                    </li>
+
+                    <!-- Sub_category Form -->
+                    <div class="modal" tabindex="-1" id="myModal-sub-{{ category.id }}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form action="{{ url_for('admin_create_subcategory') }}" method="post" enctype="multipart/form-data">
+                                    {{ sub_categories_form.csrf_token }}
+                                    {{ sub_categories_form.hidden_tag_id(value=category.id) }}
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Create Subcategory</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        {{ sub_categories_form.name(class="form-control mb-1 input-active", placeholder="Enter a subcategories title") }}
+                                        {{ sub_categories_form.img_upload(class="form-control mb-1 input-active") }}
+
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-color-green">Create</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </ul>
+
+            <div class="d-grid justify-content-center mt-3">
+                <button type="button" class="btn btn-color-green justify-content-center" data-bs-toggle="modal" data-bs-target="#myModal-2">Create Category</button>
+            </div>
+        </div>
+
+        <!-- Products -->
+
+        <div class="col-8">
+            <button type="button" class="btn btn-color-green" data-bs-toggle="modal" data-bs-target="#myModal-3">Add Product</button>
+            <div class="modal" tabindex="-1" id="myModal-3">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{{ url_for('admin_create_product', category_id=category_id, subcategory_id=subcategory_id) }}" method="post" enctype="multipart/form-data">
+                            {{ product_form.csrf_token }}
+                            {{ product_form.hidden_tag_id(value=subcategory_id) }}
+                            <div class="modal-header">
+                                <h5 class="modal-title">Add Product</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+
+                            <div class="modal-body">
+                                {{ product_form.name(class="form-control mb-1 input-active", placeholder="Enter a product title") }}
+                                {{ product_form.description(class="form-control mb-1 input-active", placeholder="Write a description") }}
+                                {{ product_form.price(class="form-control mb-1 input-active", placeholder="Enter a price") }}
+                                {{ product_form.quantity(class="form-control mb-1 input-active", placeholder="Enter a quantity") }}
+                                {{ product_form.img_upload(class="form-control input-active") }}
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-color-green">Add</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card -->
+            <div class="row row-cols-1 row-cols-md-3 g-4 mt-1">
+                {% for product in sub_category_active.products %}
+
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="row justify-content-center align-items-center">
+                                <img src="{{ url_for('static', filename=product.img_url) }}" class="mt-2 card-img img-fluid" alt="...">
+                            </div>
+
+                            <a class="button btn-close" href="{{ url_for('admin_delete_product', product_id=product.id, category_id=category_id, subcategory_id=subcategory_id) }}"></a>
+
+                            <div class="card-body">
+                                <input type="hidden" class="hidden-product-id" value='{{ product.id }}'>
+
+                                <div class="mb-2">
+                                    <label class="form-label">Name:</label>
+                                    <input type="text" class="form-control editable card-name" value="{{ product.name }}" data-original-value="{{ product.name }}" readonly>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label">Description:</label>
+                                    <input type="text" class="form-control editable card-description" value="{{ product.description }}" data-original-value="{{ product.description }}" readonly>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label">Product price (UAH):</label>
+                                    <input type="number" class="form-control editable card-price" value="{{ product.price }}" data-original-value="{{ product.price }}" min="0" oninput="this.value = Math.abs(this.value)" readonly>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Quantity:</label>
+                                    <input type="number" class="form-control editable card-quantity" value="{{ product.quantity }}" data-original-value="{{ product.quantity }}" min="0" oninput="this.value = Math.abs(this.value)" readonly>
+                                </div>
+                                <div class="footer-card d-flex justify-content-between">
+                                    <button class="btn btn-color-green editButton">Edit</button>
+                                    <button class="btn btn-color-green saveButton" style="display: none;">Save</button>
+                                    <button class="btn btn-color-green cancelButton" style="display: none;">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function(){
+        function getCookieValue(cookieName) {
+            const cookies = document.cookie.split(';');
+
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                const [name, value] = cookie.split('=');
+
+                if (name === cookieName) {
+                    return value;
+                }
+            }
+        return null;
+    }
+
+        const userId = getCookieValue('admin_id');
+
+        var fields = ['card-name', 'card-description', 'card-price', 'card-quantity'];
+
+        $('.editButton').on('click', function(){
+            $(this).closest('.card').find('.editable').removeAttr('readonly').addClass('input-active');
+            $(this).closest('.card').find('.saveButton').show();
+            $(this).closest('.card').find('.cancelButton').show();
+            $(this).hide();
+        });
+
+        $('.cancelButton').on('click', function(){
+            var button = $(this);
+            var card = button.closest('.card');
+
+            fields.forEach(function (field){
+                 card.find('.' + field).val(card.find('.' + field).attr('data-original-value'));
+            });
+
+            card.find('.editable').attr("readonly", true).removeClass('input-active');
+            card.find('.editButton').show();
+            button.hide();
+            card.find('.saveButton').hide();
+
+        });
+
+        $('.saveButton').on('click', function(){
+            var button = $(this);
+            var card = button.closest('.card');
+
+            card.find('.editable').attr("readonly", true).removeClass('input-active');
+            card.find('.editButton').show();
+            card.find('.cancelButton').hide();
+            button.hide();
+
+            var product_id = card.find('.hidden-product-id').val();
+            var changedFields = {};
+
+
+            function checkFieldChange(fieldId, fieldName) {
+                var originalValue = card.find('.' + fieldId).attr('data-original-value');
+                var newValue = card.find('.' + fieldId).val();
+
+                if (!isNaN(newValue)) {
+                    originalValue = parseFloat(originalValue);
+                    newValue = parseFloat(newValue);
+                    if (parseFloat(originalValue) !== parseFloat(newValue)) {
+                        card.find('.' + fieldId).attr('data-original-value', newValue);
+                        changedFields[fieldName] = newValue;
+                    }
+                } else if (originalValue !== newValue){
+                    card.find('.' + fieldId).attr('data-original-value', newValue);
+                    changedFields[fieldName] = newValue;
+                }
+            }
+
+            fields.forEach(function(fieldId) {
+                checkFieldChange(fieldId, fieldId);
+            });
+
+            if (Object.keys(changedFields).length > 0) {
+                var product_data = {
+                    product_id: product_id,
+                    ...changedFields
+                };
+                console.log(product_data);
+
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    headers: {
+                        "Admin-ajax-id": userId
+                    },
+                    url: '/edit_product',
+                    data: JSON.stringify(product_data),
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status == 'success') {
+                            $(button).closest('.footer-card').append('<div class="alert-custom">' + response.message + '</div>');
+
+                            setTimeout(function () {
+                                button.closest('.footer-card').find('.alert-custom').fadeOut(250, function () {
+                                    $(this).remove();
+                                });
+                            }, 500);
+                        }
+                    }
+                });
+            }
+        });
+});
+</script>
+</body>
+</html>

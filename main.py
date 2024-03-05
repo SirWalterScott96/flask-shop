@@ -21,12 +21,12 @@ from flask.cli import with_appcontext
 from getpass import getpass
 
 ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg']
-COOKIE_DURATION = timedelta(days=3)
+ADMIN_COOKIE_DURATION = timedelta(days=3)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'change_this_string_its_important'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-app.config['REMEMBER_COOKIE_DURATION'] = COOKIE_DURATION
+app.config['REMEMBER_COOKIE_DURATION'] = ADMIN_COOKIE_DURATION
 app.config["UPLOAD_EXTENSIONS"] = ["jpg", "png"]
 app.config['UPLOAD_FOLDER_PRODUCT_IMGS'] = os.path.join(os.path.abspath('static/product_imgs'))
 app.config['UPLOAD_FOLDER_SUBCATEGORY_IMGS'] = os.path.join(os.path.abspath('static/subcategory_imgs'))
@@ -210,10 +210,23 @@ def home():
     return render_template('index.html', categories=categories)
 
 
-@app.route('/category/<category_id>')
+@app.route('/category-<category_id>')
 def category(category_id):
-    category_local = Categories.query.all()
-    return render_template('category.html', categories=category_local, category_id=int(category_id))
+    categories = Categories.query.all()
+    category_active = Categories.query.filter_by(id=category_id).first()
+    return render_template('category.html',
+                           categories=categories,
+                           category_id=int(category_id),
+                           category_active=category_active)
+
+
+@app.route('/category-<category_id>/subcategory-<subcategory_id>')
+def subcategory(category_id, subcategory_id):
+    categories = Categories.query.all()
+    subcategory_active = Subcategory.query.filter_by(id=subcategory_id).first()
+    return render_template('subcategories.html', categories=categories,
+                           subcategory_active=subcategory_active,
+                           category_id=int(category_id))
 
 
 @app.route('/admin')

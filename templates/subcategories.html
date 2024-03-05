@@ -125,6 +125,7 @@
 
 <div class="container">
     <div class="row">
+
         <div class="col-3">
             <ul class="nav nav-category">
                 {% for category in categories %}
@@ -138,18 +139,19 @@
                         {% if category.id == category_id %}
                             <ul class="list-group collapse show" id="category-{{ category.id }}">
                         {% else %}
-
                             <ul class="list-group collapse" id="category-{{ category.id }}">
                         {% endif %}
 
                         {% for subcategory in category.sub_category %}
-                            {#                            {% if subcategory.id == subcategory_active.id %}#}
-                            {#                                <div class="list-group-item link-weight border-bottom"><a href="{{ url_for('admin', category_id=category.id, subcategory_id=subcategory.id) }}" class="category-link-small color-active">{{ subcategory.name }}</a></div>#}
-                            {#                            {% else %}#}
-                            <div class="list-group-item link-weight border-bottom"><a
-                                    href="{{ url_for('subcategory', category_id=category.id, subcategory_id=subcategory.id) }}"
-                                    class="category-link-small">{{ subcategory.name }}</a></div>
-                            {#                            {% endif %}#}
+                            {% if subcategory.id == subcategory_active.id %}
+                                <div class="list-group-item link-weight border-bottom">
+                                    <a href="{{ url_for('subcategory', category_id=category.id, subcategory_id=subcategory.id) }}" class="category-link-small color-active">{{ subcategory.name }}</a>
+                                </div>
+                            {% else %}
+                                <div class="list-group-item link-weight border-bottom">
+                                    <a href="{{ url_for('subcategory', category_id=category.id, subcategory_id=subcategory.id) }}" class="category-link-small">{{ subcategory.name }}</a>
+                                </div>
+                            {% endif %}
                         {% endfor %}
                         </ul>
                     </li>
@@ -157,17 +159,45 @@
             </ul>
         </div>
 
-    <!-- Subcategories -->
+    <!-- Product Cards -->
         <div class="col-8">
             <div class="row row-cols-1 row-cols-md-3 g-4 mt-1">
-                {% for subcategory in category_active.sub_category %}
+                {% for product in subcategory_active.products %}
                         <div class="col-md-4">
-                            <a href="{{ url_for('subcategory', category_id=subcategory.category_id, subcategory_id=subcategory.id) }}" class="product-link">
-                                <div class="card-subcategory" >
-                                        <img src="{{ url_for('static', filename=subcategory.img_url) }}" class="img-fluid mb-2" alt="...">
-                                        <h5 class="card-title" style="text-align: center">{{ subcategory.name }}</h5>
+                            <div class="card">
+                                <div class="row justify-content-center align-items-center">
+                                    <img src="{{ url_for('static', filename=product.img_url) }}" class="mt-2 card-img img-fluid" alt="...">
                                 </div>
-                            </a>
+
+                                <div class="card-body">
+                                    <input type="hidden" class="hidden-product-id" value='{{ product.id }}'>
+
+                                    <div class="mb-2">
+                                        <label class="form-label">Name:</label>
+                                        <input type="text" class="form-control editable card-name" value="{{ product.name }}" data-original-value="{{ product.name }}" readonly>
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <label class="form-label">Description:</label>
+                                        <input type="text" class="form-control editable card-description" value="{{ product.description }}" data-original-value="{{ product.description }}" readonly>
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <label class="form-label">Product price (UAH):</label>
+                                        <input type="number" class="form-control editable card-price" value="{{ product.price }}" data-original-value="{{ product.price }}" min="0" oninput="this.value = Math.abs(this.value)" readonly>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Quantity:</label>
+                                        <input type="number" class="form-control editable card-quantity" value="{{ product.quantity }}" data-original-value="{{ product.quantity }}" min="0" oninput="this.value = Math.abs(this.value)" readonly>
+                                    </div>
+                                    <div class="footer-card d-flex justify-content-between">
+                                        <button class="btn btn-color-green editButton">Edit</button>
+                                        <button class="btn btn-color-green saveButton" style="display: none;">Save</button>
+                                        <button class="btn btn-color-green cancelButton" style="display: none;">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                 {% endfor %}
             </div>

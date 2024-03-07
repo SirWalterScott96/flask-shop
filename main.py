@@ -238,12 +238,10 @@ def admin():
 
     categories = Categories.query.all()
 
-    response = make_response(render_template('admin.html', categories=categories,
-                                             categories_form=categories_form,
-                                             product_form=product_form,
-                                             sub_categories_form=sub_categories_form))
-    response.set_cookie('admin_id', '5000', max_age=3600)
-    return response
+    return render_template('admin.html', categories=categories,
+                           categories_form=categories_form,
+                           product_form=product_form,
+                           sub_categories_form=sub_categories_form)
 
 
 @app.route('/admin/category-<category_id>')
@@ -462,7 +460,7 @@ def admin_create_product(category_id, subcategory_id):
         image_name = str(uuid.uuid4()) + '_' + secure_filename(image.filename)
         image_path = os.path.join(app.config['UPLOAD_FOLDER_PRODUCT_IMGS'], image_name)
         image.save(image_path)
-        resize_img(image_path)
+        # resize_img(image_path)
 
         product = Products(name=product_form.name.data,
                            price=product_form.price.data,
@@ -478,11 +476,12 @@ def admin_create_product(category_id, subcategory_id):
     return redirect(url_for('admin_show_products'))
 
 
-@app.route('/edit_product', methods=['POST'])
+@app.route('/edit_product', methods=['PATCH'])
 def edit_product():
-    header_validation = request.headers.get('Admin-Ajax-Id')
+    print(session)
+    is_admin_request = Admin.query.filter_by(id=session['_user_id']).first()
 
-    if not header_validation:
+    if not is_admin_request:
         abort(403)
 
     data = request.get_json()

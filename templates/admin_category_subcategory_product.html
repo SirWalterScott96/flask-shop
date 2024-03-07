@@ -130,8 +130,7 @@
             </div>
         </div>
 
-        <!-- Products -->
-
+        <!-- Products Form -->
         <div class="col-8">
             <button type="button" class="btn btn-color-green" data-bs-toggle="modal" data-bs-target="#myModal-3">Add Product</button>
             <div class="modal" tabindex="-1" id="myModal-3">
@@ -151,6 +150,7 @@
                                 {{ product_form.price(class="form-control mb-1 input-active", placeholder="Enter a price") }}
                                 {{ product_form.quantity(class="form-control mb-1 input-active", placeholder="Enter a quantity") }}
                                 {{ product_form.img_upload(class="form-control input-active") }}
+                                <div id="imgHelp" class="form-text">Image size should be 450x450 px</div>
                             </div>
 
                             <div class="modal-footer">
@@ -212,22 +212,6 @@
 
 <script>
 $(document).ready(function(){
-        function getCookieValue(cookieName) {
-            const cookies = document.cookie.split(';');
-
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                const [name, value] = cookie.split('=');
-
-                if (name === cookieName) {
-                    return value;
-                }
-            }
-        return null;
-    }
-
-        const userId = getCookieValue('admin_id');
-
         var fields = ['card-name', 'card-description', 'card-price', 'card-quantity'];
 
         $('.editButton').on('click', function(){
@@ -291,14 +275,9 @@ $(document).ready(function(){
                     product_id: product_id,
                     ...changedFields
                 };
-                console.log(product_data);
-
                 $.ajax({
-                    type: 'POST',
+                    type: 'PATCH',
                     contentType: 'application/json',
-                    headers: {
-                        "Admin-ajax-id": userId
-                    },
                     url: '/edit_product',
                     data: JSON.stringify(product_data),
                     dataType: 'json',

@@ -1,4 +1,18 @@
 /*Main Color: color: rgb(10, 173, 10);*/
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  line-height: 1;
+}
+
+h4 {
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
 
 .btn-close {
   background-color: transparent;
@@ -28,6 +42,7 @@
   font-size: 22px;
   text-decoration: none;
   color: black;
+  transition: all 0.3s;
 }
 
 .category-link-small {
@@ -68,6 +83,16 @@
   color: rgb(10, 173, 10);
 }
 
+.color-active-icons path,
+.color-active-icons line {
+    transition: all 0.3s;
+}
+
+.color-active-icons:hover path,
+.color-active-icons:hover line {
+    stroke: rgb(10, 173, 10); /* Змінює колір контуру на червоний */
+}
+
 .card {
   transition: all 0.3s;
   border-radius: 0.5rem !important;
@@ -78,7 +103,7 @@
 }
 
 .card-img {
-  width: auto;
+  max-width: 100%;
 }
 
 .input-active:hover,
@@ -119,5 +144,164 @@
 
 .product-link:hover {
   color: #212529;
+}
+
+.card-custom-footer{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.card-custom-name {
+  word-wrap: break-word;
+}
+
+.card-custom {
+  padding: 16px;
+  border: 1px solid #dfe2e1;
+  border-radius: 0.5rem;
+  line-height: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.card-custom:hover {
+  border-color: rgb(10, 173, 10);
+}
+
+/*.card-custom-footer{*/
+/*  line-height: 0;*/
+/*}*/
+
+.card-price {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: #fff;
+  text-decoration: none;
+  padding: 8px 14px;
+  background-color: rgb(10, 173, 10);
+  border-radius: 0.5rem;
+  transition: all 0.3s;
+}
+
+.card-add-btn:hover {
+  color: #fff;
+  background-color: rgb(9, 151, 9);
+}
+
+.search-box{
+  display: flex;
+}
+
+.search-line {
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  top: 25%;
+  right: 2%;
+
+}
+
+.highlight-custom{
+  color: #212529;
+}
+
+/*NAVBAR*/
+
+nav ul li {
+  list-style: none;
+}
+
+nav ul {
+  padding: 0;
+}
+
+.navbar a{
+  display: inline-block;
+  text-decoration: none;
+}
+
+.menu-btn {
+  padding: 12px 32px;
+  background-color: rgb(10, 173, 10);
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  color: #fff;
+  transition: all 0.3s;
+}
+
+.menu-btn:hover {
+  color: #fff;
+  background-color: rgb(9, 151, 9);
+}
+
+.submenu {
+  position: absolute;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: #fff;
+  box-shadow:0 0 2px rgba(145,158,171,.2),
+              0 12px 24px -4px rgba(145,158,171,.12);
+  transform: translateY(-10px);
+  border-radius: 0.5rem;
+  opacity: 0;
+  z-index: -999;
+  transition-property: opacity, transform;
+  transition-duration: 0.5s, 0.6s;
+
+}
+
+.submenu li a {
+  color: #212529;
+  font-size: 16px;
+}
+
+.submenu li {
+  margin-bottom: 5px;
+  transition: all 0.1s;
+}
+
+.submenu li:last-child {
+  margin-bottom: 0;
+}
+
+.submenu li:hover {
+  border-radius: 0.5rem;
+  background-color: #e3e3e3;
+}
+
+.menu-btn:hover + .submenu,
+.submenu:hover{
+  z-index: 99;
+  opacity: 1;
+  transform: translateY(0px);
+}
+
+.nav-item-custom{
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.nav-item-custom, .nav-item-custom:hover {
+  color: #212529;
+}
+
+.active-color {
+  transition: all 0.2s;
+}
+
+.active-color:hover{
+  color: rgb(10, 173, 10);
 }
 

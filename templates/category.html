@@ -22,7 +22,7 @@
                 <!-- LOGO -->
                 <div class="col-xxl-2 col-lg-3 col-md-6 col-5">
                     <a href="{{ url_for('home') }}">
-                        <img src="{{ url_for('static', filename='icons/freshcart-logo.svg') }}" alt="">
+                        <img src="{{ url_for('static', filename='icons/freshcart-logo.svg') }}" class="logo-link" alt="">
                     </a>
                 </div>
 
@@ -100,13 +100,10 @@
                         {% endif %}
 
                         {% for subcategory in category.sub_category %}
-                            {#                            {% if subcategory.id == subcategory_active.id %}#}
-                            {#                                <div class="list-group-item link-weight border-bottom"><a href="{{ url_for('admin', category_id=category.id, subcategory_id=subcategory.id) }}" class="category-link-small color-active">{{ subcategory.name }}</a></div>#}
-                            {#                            {% else %}#}
                             <div class="list-group-item link-weight border-bottom"><a
                                     href="{{ url_for('subcategory', category_id=category.id, subcategory_id=subcategory.id) }}"
-                                    class="category-link-small">{{ subcategory.name }}</a></div>
-                            {#                            {% endif %}#}
+                                    class="category-link-small">{{ subcategory.name }}</a>
+                            </div>
                         {% endfor %}
                         </ul>
                     </li>
@@ -118,11 +115,13 @@
         <div class="col-8">
             <div class="row row-cols-1 row-cols-md-3 g-4 mt-1">
                 {% for subcategory in category_active.sub_category %}
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <a href="{{ url_for('subcategory', category_id=subcategory.category_id, subcategory_id=subcategory.id) }}" class="product-link">
-                                <div class="card-subcategory" >
-                                        <img src="{{ url_for('static', filename=subcategory.img_url) }}" class="img-fluid mb-2" alt="...">
-                                        <h5 class="card-title" style="text-align: center">{{ subcategory.name }}</h5>
+                                <div class="card card-product">
+                                    <div class="card-body">
+                                        <img src="{{ url_for('static', filename=subcategory.img_url) }}" class="img-fluid mb-3" alt="...">
+                                        <div style="text-align: center">{{ subcategory.name }}</div>
+                                    </div>
                                 </div>
                             </a>
                         </div>

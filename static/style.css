@@ -6,12 +6,43 @@
   line-height: 1;
 }
 
+input:hover {
+  border-color: rgb(10, 173, 10);
+}
+
 h4 {
   margin: 0;
 }
 
 p {
   margin: 0;
+}
+
+.form-control:focus,
+.form-check-input:focus {
+  border-color: rgb(10, 173, 10) !important;
+  box-shadow: 0 0 10px rgba(10, 173, 10, 0.555) !important;
+}
+
+input[type='checkbox']:checked{
+  background-color: rgb(10, 173, 10);
+}
+
+.link-color {
+  text-decoration: none;
+  color: rgb(10, 173, 10);
+  transition: all 0.2s;
+}
+
+.link-color:hover {
+  color: rgb(9, 151, 9);
+}
+
+.link-color:focus,
+.logo-link:focus,
+.link-icon:focus{
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
 
 .btn-close {
@@ -32,10 +63,6 @@ p {
   border-left: none;
   border-right: none;
   border-radius: 0;
-}
-
-.item-color {
-  background-color: red;
 }
 
 .category-link {
@@ -70,12 +97,14 @@ p {
   transition: all 0.3s;
 }
 
-.btn-color-green:hover {
+.btn-color-green:hover,
+.green-color:hover {
   color: #fff;
   background-color: rgb(9, 151, 9);
 }
 
-.green-color{
+.green-color {
+  color: #fff;
   background-color: rgb(10, 173, 10);
 }
 
@@ -111,10 +140,7 @@ p {
   border-color: rgb(10, 173, 10);
 }
 
-.input-active:focus {
-  border-color: rgb(10, 173, 10);
-  box-shadow: 0 0 10px rgba(10, 173, 10, 0.555);
-}
+
 
 .alert-custom {
   align-self: center;
@@ -124,11 +150,6 @@ p {
   border-radius: 0.25rem;
   border-color: #badbcc;
 }
-
-/*.img-subcategory{*/
-/*  width: auto;*/
-
-/*}*/
 
 .card-subcategory{
   overflow: hidden;
@@ -305,3 +326,36 @@ nav ul {
   color: rgb(10, 173, 10);
 }
 
+
+/*SLIDERS*/
+
+.slider-custom {
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 0.5rem;
+  height: 480px;
+}
+
+.slider-body {
+  width: 42%;
+  padding: 128px 0 128px 128px;
+}
+
+.swiper{
+  height: 225px;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  color: rgb(10, 173, 10) !important;
+}
+
+
+.custom-section-banner {
+  padding: 48px 32px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}

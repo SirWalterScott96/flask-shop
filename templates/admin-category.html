@@ -132,11 +132,13 @@
             <!-- Card -->
             <div class="row row-cols-1 row-cols-md-3 g-4 mt-1">
                 {% for subcategory in subcategories_in_category.sub_category %}
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <a href="{{ url_for('admin_show_products', category_id=subcategory.category_id, subcategory_id=subcategory.id) }}" class="product-link">
-                                <div class="card-subcategory" >
+                                <div class="card">
+                                    <div class="card-body">
                                         <img src="{{ url_for('static', filename=subcategory.img_url) }}" class="img-fluid mb-2" alt="...">
                                         <h5 class="card-title" style="text-align: center">{{ subcategory.name }}</h5>
+                                    </div>
                                 </div>
                             </a>
                         </div>

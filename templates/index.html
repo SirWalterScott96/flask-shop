@@ -10,6 +10,11 @@
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <body>
         <!-- Navigation -->
     <div class="border-bottom mb-4">
@@ -75,5 +80,126 @@
             </div>
         </nav>
     </div>
-  </body>
+    <main>
+        <div class="container">
+            <section class="mt-5">
+                <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+                      <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                      </div>
+                      <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <div class="slider-custom" style="background-image: url({{ url_for('static', filename='site_imgs/slide-1.jpg') }}) ">
+                                    <div class="slider-body">
+                                        <span class="badge bg-warning text-dark">Opening Sale Discount 50%</span>
+                                        <h2 class="text-dark display-5 fw-bold mt-4">SuperMarket For Fresh Grocery</h2>
+                                        <p class="lead mb-2">Introduced a new model for online grocery shopping and convenient home delivery.</p>
+                                        <a href="#" class="btn btn-dark mt-3">Shop Now</a>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                          <div class="slider-custom slider-custom-2" style="background-image: url({{ url_for('static', filename='site_imgs/slider-2.jpg') }}) ">
+                                    <div class="slider-body">
+                                        <span class="badge bg-warning text-dark">Free Shipping - orders over $100</span>
+                                        <h2 class="text-dark display-5 fw-bold mt-4">Free Shipping on orders over <span class="color-active">$100</span></h2>
+                                        <p class="lead mb-2">Free Shipping to First-Time Customers Only, After promotions and discounts are applied.</p>
+                                        <a href="#" class="btn btn-dark mt-3">Shop Now</a>
+                                    </div>
+                            </div>
+                        </div>
+                      </div>
+                      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                      </button>
+                      <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                      </button>
+                </div>
+            </section>
+
+            <section class="mb-lg-10 mt-lg-14 my-5">
+                <h3 class="mb-3">Featured Categories</h3>
+                <div class="swiper">
+                    <div class="swiper-wrapper">
+                        {% for sub in subcategory %}
+                        <div class="swiper-slide">
+                            <a href="{{ url_for('subcategory', category_id=sub.category_id, subcategory_id=sub.id) }}" style="text-decoration: none; color: #212529">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <img src="{{ url_for('static', filename=sub.img_url) }}" class="img-fluid mb-2" alt="...">
+                                        <div style="text-align: center">{{ sub.name }}</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+            </section>
+
+            <section class="mb-5">
+                <div class="row">
+                    <div class="col-12 col-md-6 mb-3 mb-lg-0">
+                        <div>
+                            <div class="rounded custom-section-banner" style="background-image: url({{ url_for('static', filename='site_imgs/grocery-banner.png') }})">
+                                <div>
+                                    <h3 class="fw-bold mb-1">Fruits & Vegetables</h3>
+                                    <p class="mb-4">
+                                        Get Upto
+                                        <span class="fw-bold">30%</span>
+                                    </p>
+                                    <a href="#" class="btn btn-dark">Shop Now</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div>
+                            <div class="rounded custom-section-banner" style="background-image: url({{ url_for('static', filename='site_imgs/grocery-banner-2.jpg') }})">
+                                <div>
+                                    <h3 class="fw-bold mb-1">Freshly Baked Buns</h3>
+                                    <p class="mb-4">
+                                        Get Upto
+                                        <span class="fw-bold">25%</span>
+                                    </p>
+                                    <a href="#" class="btn btn-dark">Shop Now</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+
+<script>
+    var swiper = new Swiper('.swiper', {
+        spaceBetween: 25,
+        slidesPerView: 6,
+        direction: 'horizontal',
+        loop: true,
+        autoplay: {
+            delay: 3000,
+            disableOnInteraction: false,
+        },
+        speed: 700,
+        easy: 'ease-in',
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+            },
+        scrollbar: {
+            el: '.swiper-scrollbar',
+            },
+            });
+</script>
+</body>
 </html>

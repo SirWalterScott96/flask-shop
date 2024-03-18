@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Orders</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/fontawesome.min.css" integrity="sha384-BY+fdrpOd3gfeRvTSMT+VUZmA728cfF9Z2G42xpaRkUGu2i3DyzpTURDo5A6CaLK" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+</head>
+<body>
+        <!-- Navigation -->
+    <div class="border-bottom mb-4">
+        <div class="py-3">
+            <div class="container">
+                <div class="row w-100 align-items-center gx-lg-2 gx-0">
+
+                    <!-- LOGO -->
+                    <div class="col-xxl-2 col-lg-3 col-md-6 col-5">
+                        <a href="{{ url_for('public.home') }}">
+                            <img src="{{ url_for('static', filename='icons/freshcart-logo.svg') }}" class="logo-link" alt="">
+                        </a>
+                    </div>
+
+                    <!-- Nav SearchBar -->
+                    <div class="col-xxl-5 col-lg-5 d-none d-lg-block">
+                        <form action="#">
+                            <div class="">
+                                <div class="search-line">
+                                    <input type="search" class="form-control rounded" placeholder="Search for products">
+                                    <div class="search-icon">
+                                        <i class="fa-solid fa-magnifying-glass highlight-custom"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Nav Icons -->
+                    <div class="col-lg-2 col-xxl-4 text-end col-md-6 col-7">
+                        <div class="d-flex align-items-center justify-content-center gap-3">
+                            <div class="nav-icon icon-cart" data-cart-value="{{ session['cart']|length }}">
+                                <svg class="color-active-icons" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="#c1c7c6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4ZM3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></g></svg>
+                            </div>
+                            <div class="nav-icon">
+                                <a href="{{ url_for('user.user_dashboard') }}">
+                                    <svg class="color-active-icons" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="#c1c7c6" stroke-dasharray="28" stroke-dashoffset="28" stroke-linecap="round" stroke-width="2"><path d="M4 21V20C4 16.6863 6.68629 14 10 14H14C17.3137 14 20 16.6863 20 20V21" stroke-dashoffset="0"/><path d="M12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7C16 9.20914 14.2091 11 12 11Z" stroke-dashoffset="0"/></g></svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NAVBAR -->
+        <nav class="navbar navbar-expand-lg navbar-light navbar-default py-0 pb-lg-2">
+            <div class="container">
+                <ul class="d-flex align-items-center gap-4">
+                    <li><a href="#" class="menu-btn">
+                            <div class="d-flex align-items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="white" d="M13 21v-8h8v8zm0-10V3h8v8zM3 11V3h8v8zm0 10v-8h8v8z"/></svg>
+                                <strong>Categories</strong>
+                            </div>
+                        </a>
+                        <ul class="submenu">
+                            {% for category in categories %}
+                                <li class="px-1 mx-2"><a class="px-4 py-2" href="{{ url_for('product.category', category_id=category.id) }}">{{ category.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <li><a href="#" class="nav-item-custom active-color">Contacts</a></li>
+                    <li><a href="#" class="nav-item-custom active-color">Payment and delivery</a></li>
+                    <li><a href="#" class="nav-item-custom active-color">About Us</a></li>
+                    <li><a href="#" class="nav-item-custom active-color menu d-flex align-items-center gap-1">
+                        Account
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                            <path fill="none" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m7 10l5 5m0 0l5-5"/>
+                        </svg>
+                        </a>
+                        <ul class="submenu">
+                            <li class="px-1 mx-2"><a href="{{ url_for('user.user_login') }}" class="px-4 py-2">Sign in</a></li>
+                            <li class="px-1 mx-2"><a href="{{ url_for('user.user_register') }}" class="px-4 py-2">Sign up</a></li>
+                            <li class="px-1 mx-2"><a href="#" class="px-4 py-2">Forgot Password</a></li>
+                            <li class="px-1 mx-2">
+                                <a href="#" class="px-4 py-2 d-flex align-items-center gap-1 menu">My Account
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                        <path fill="black" d="m13.172 12l-4.95-4.95l1.414-1.413L16 12l-6.364 6.364l-1.414-1.415z"/>
+                                    </svg>
+                                </a>
+                                    <ul class="submenu-account">
+                                        <li class="px-1 mx-2"><a href="#" class="px-4 py-2">Orders</a></li>
+                                        <li class="px-1 mx-2"><a href="#" class="px-4 py-2">Settings</a></li>
+                                        <li class="px-1 mx-2"><a href="#" class="px-4 py-2">Address</a></li>
+                                        <li class="px-1 mx-2"><a href="#" class="px-4 py-2">Notification</a></li>
+                                    </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <main>
+        <div class="container">
+            <h1>Placing an order</h1>
+            <div class="row row-cols-2 mt-3">
+                <!-- Order Form -->
+                <div class="col">
+                    <h5 class="text-uppercase">personal data</h5>
+                    <form id="orderForm" class="mt-3">
+                        <div class="row row-cols-lg-2 g-4">
+                            <div class="col-12 alert alert-danger alert-dismissible fade show" id="formError" style="display: none">
+                            </div>
+                            <div class="col form-control-custom">
+                                <input type="text" class="form-control order-form" placeholder="Your name" name="name" id="name" required>
+                            </div>
+                            <div class="col form-control-custom">
+                                <input type="number" class="form-control order-form" placeholder="Phone number" id="phone_number" name="phone_number" required>
+                                <i class="fas fa-check-circle"></i>
+                                <i class="fas fa-exclamation-circle"></i>
+                                <small>Error message</small>
+                            </div>
+                            <div class="col">
+                                <input type="text" class="form-control order-form" placeholder="Street" name="street" required>
+                            </div>
+                            <div class="col form-control-custom">
+                                <input type="email" class="form-control order-form" placeholder="Email" id="email" name="email" required>
+                                <i class="fas fa-check-circle"></i>
+                                <i class="fas fa-exclamation-circle"></i>
+                                <small>Error message</small>
+                            </div>
+                            <div class="col">
+                                <input type="text" class="form-control order-form" placeholder="House number" name="house_number" required>
+                            </div>
+                            <div class="col">
+                                <input type="text" class="form-control order-form" placeholder="Entrance number" name="entrance_number" required>
+                            </div>
+                            <div class="col-12">
+                                <textarea class="form-control order-form" placeholder="Order comment" name="comment"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-color-green submit-order" style="width: 100%">Make an order</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Cart -->
+                <div class="col">
+                    <h5 class="text-uppercase">cart</h5>
+                    <ul class="list-group gap-3 border-bottom pb-4">
+                        {% for product, quantity in cart.items() %}
+                            <li class="list-group-item d-flex flex-row align-items-center" style="height: 100px" data-product-id="{{ product.id }}">
+                                <img src="{{ url_for('static', filename=product.img_url) }}" alt="" class="img-fluid" style="max-height: 100px;">
+                                <div class="col-6">
+                                    <div class="d-flex flex-column flex-nowrap">
+                                        <h5>{{ product.name }}</h5>
+                                        <p><strong class="product-price" data-price="{{ product.price }}">{{ product.price * quantity }}</strong> UAH </p>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <button  class="btn btn-color-green decrease" type="button">-</button>
+                                    </div>
+                                    <input type="number" class="form-control text-center quantity-input" value="{{ quantity }}" data-quantity-max="{{ product.quantity }}" min="1" oninput="this.value = Math.min(Math.max(this.value, 1), {{ product.quantity }});" style="height: 38px">
+                                    <div class="input-group-append">
+                                        <button  class="btn btn-color-green increase" type="button">+</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <svg class="icon-trash d-inline-flex" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" cursor="pointer"><path fill="currentColor" d="M19 4h-3.5l-1-1h-5l-1 1H5v2h14M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6z"/></svg>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <h5 class="mt-4">Order amount</h5>
+                    <h4><strong class="total-amount"></strong> UAH</h4>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row g-4 py-5">
+                <div class="col-6 col-sm-6 col-md-3">
+                    <h5 class="mb-4 text-lef3">Get to know us</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">Company</a></li>
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">About</a></li>
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">Blog</a></li>
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">Help Center</a></li>
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">Our Value</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-sm-6 col-md-3">
+                    <h5 class="mb-4 text-left">For Consumers</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">Payments</a></li>
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">Shipping</a></li>
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">Product Returns</a></li>
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">FAQ</a></li>
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">Shop Checkout</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-sm-6 col-md-3">
+                    <h5 class="mb-4 text-left">Become a Shopper</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">Shopper Opportunities</a></li>
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">Become a Shopper</a></li>
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">Earings</a></li>
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">Ideas & Guides</a></li>
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">New Retailers</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-sm-6 col-md-3">
+                    <h5 class="mb-4 text-left">Freshcart programs</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">Freshcart programs</a></li>
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">Gift Cards</a></li>
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">Promos & Coupons</a></li>
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">Freshcart Ads</a></li>
+                        <li class="nav-item mb-3"><a href="#" class="footer-link">Careers</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-top py-4">
+                <div class="row align-items-center">
+                    <div class="col-lg-5 text-lg-start text-center mb-2 mb-lg-0">
+                        <ul class="list-inline mb-0">
+                            <li class="list-inline-item text-dark">Payment Partners</li>
+                            <li class="list-inline-item"><a href="#"><img src="{{ url_for('static', filename='site_imgs/footer_imgs/amazonpay.svg') }}" alt=""></a></li>
+                            <li class="list-inline-item"><a href="#"><img src="{{ url_for('static', filename='site_imgs/footer_imgs/american-express.svg') }}" alt=""></a></li>
+                            <li class="list-inline-item"><a href="#"><img src="{{ url_for('static', filename='site_imgs/footer_imgs/mastercard.svg') }}" alt=""></a></li>
+                            <li class="list-inline-item"><a href="#"><img src="{{ url_for('static', filename='site_imgs/footer_imgs/paypal.svg') }}" alt=""></a></li>
+                            <li class="list-inline-item"><a href="#"><img src="{{ url_for('static', filename='site_imgs/footer_imgs/visa.svg') }}" alt=""></a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-7 mt-4 mt-md-0">
+                        <ul class="list-inline mb-0 text-lg-end text-center">
+                            <li class="list-inline-item mb-2 mb-md-0 text-dark">Get deliveries with FreshCart</li>
+                            <li class="list-inline-item ms-4"><a href="#"><img src="{{ url_for('static', filename='site_imgs/footer_imgs/appstore-btn.svg') }}" alt="" width="140px"></a></li>
+                            <li class="list-inline-item ms-4"><a href="#"><img src="{{ url_for('static', filename='site_imgs/footer_imgs/googleplay-btn.svg') }}" alt="" width="140px"></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="border-top py-4">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <span class="small text-muted ">© 2022 - 2024 FreshCart eCommerce HTML Template. All rights reserved. Powered by Me:)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+<script>
+$(document).ready(function() {
+    updateTotalAmount();
+
+    var incrementButtons = $('.increase');
+    var decrementButtons = $('.decrease');
+
+    $('.icon-trash').on('click', function (){
+        $(this).closest('li').fadeOut('slow', function (){
+            $(this).remove();
+            updateTotalAmount();
+        });
+    });
+
+    incrementButtons.on('click', function() {
+        var input = $(this).closest('.input-group').find('.quantity-input');
+        var value = parseInt(input.val(), 10);
+        if (parseInt(input.data('quantity-max'), 10) - 1 >= value) {
+            input.val(value + 1).trigger('change');
+        }
+        updateTotalAmount();
+    });
+
+    decrementButtons.on('click', function() {
+        var input = $(this).closest('.input-group').find('.quantity-input')
+        var value = parseInt(input.val(), 10);
+        if (value > 1) {
+            input.val(value - 1).trigger('change');
+        }
+        updateTotalAmount();
+    });
+
+    $('.quantity-input').on('change', function (){
+        var price = $(this).closest('.list-group-item').find('.product-price');
+        var quantity = parseInt($(this).val());
+        var totalPrice = parseFloat(price.attr('data-price')) * quantity;
+        price.text(totalPrice.toFixed(2))
+        updateTotalAmount();
+    });
+
+    function updateTotalAmount() {
+         var totalAmount = 0;
+
+         $('.list-group-item').each(function () {
+            var price = parseFloat($(this).find('.product-price').attr('data-price'));
+            var quantity = parseInt($(this).find('.quantity-input').val());
+            totalAmount += price * quantity;
+         });
+         $('.total-amount').text(totalAmount.toFixed(2));
+    }
+
+    $('#email').blur(function() {
+        checkFieldValidity($(this), isValidEmail, 'Please enter a valid email address.');
+    });
+
+    $('#phone_number').blur(function() {
+        checkFieldValidity($(this), isValidPhoneNumber, 'Incorrect phone number, should start with 380.');
+    });
+
+    function checkFieldValidity(input, validator, errorMessage) {
+        var inputValue = input.val();
+        var isValid = validator(inputValue);
+        if (!isValid) {
+            setErrorFor(input, errorMessage);
+        } else {
+            setSuccessFor(input);
+        }
+    }
+
+    function isValidEmail(email) {
+        var emailPattern = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        return emailPattern.test(email);
+    }
+
+    function isValidPhoneNumber(phoneNumber) {
+        var cleanedPhoneNumber = phoneNumber.replace(/\D/g, '');
+        return cleanedPhoneNumber.length === 12;
+    }
+
+    function setErrorFor(input, message) {
+        var errorMessageElement = input.siblings('small');
+        errorMessageElement.text(message);
+        var formControl = input.closest('.form-control-custom');
+        formControl.addClass('error').removeClass('success');
+    }
+
+    function setSuccessFor(input) {
+        var formControl = input.closest('.form-control-custom');
+        formControl.removeClass('error').addClass('success');
+    }
+
+    function checkInputs() {
+        var isValid = true;
+        $('#orderForm [required]').each(function() {
+            if (!$(this).val()) {
+                isValid = false;
+                return false;
+            }
+        });
+        return isValid;
+    }
+
+    $('.submit-order').click(function(){
+        if (!checkInputs()) {
+            return;
+        }
+
+        var formData = $('#orderForm').serialize();
+        var productsData = {};
+
+
+        $('.list-group-item').each(function() {
+            var productId = $(this).data('product-id');
+            var productQuantity = $(this).find('.quantity-input').val();
+            productsData[productId] = productQuantity;
+        });
+
+        var requestData = {
+            formData: formData,
+            productsData: productsData
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/orders/submit-order',
+            data: JSON.stringify(requestData),
+            contentType: 'application/json',
+            success: function() {
+                window.location.href = '/orders/success'
+            },
+            error: function(xhr, status, error) {
+                if (xhr.status === 400) {
+                    $('#formError')
+                        .text('Invalid data. Please try again.')
+                        .show()
+                } else {
+                    console.error('Error:', error);
+                }
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

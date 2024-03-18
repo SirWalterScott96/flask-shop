@@ -1,0 +1,35 @@
+# -*- coding: utf-8 -*-
+"""Application configuration."""
+import os
+from dotenv import load_dotenv
+from datetime import timedelta
+from flask.helpers import get_debug_flag
+from pathlib import Path
+load_dotenv()
+
+
+class Config:
+    APP_DIR = Path(__file__).parent
+    ENV = "dev"
+    SECRET_KEY = os.getenv('SECRET_KEY')
+    FLASK_DEBUG = get_debug_flag()
+    UPLOAD_EXTENSIONS = ["jpg", "png"]
+    REMEMBER_COOKIE_DURATION = timedelta(days=3)
+    UPLOAD_FOLDER_PRODUCT_IMGS = APP_DIR / 'static' / 'product_imgs'
+    UPLOAD_FOLDER_SUBCATEGORY_IMGS = os.path.join(APP_DIR, 'static/subcategory_imgs')
+
+    SQLALCHEMY_DATABASE_URI = f"sqlite:///{APP_DIR / 'instance' / 'database.db'}"
+    MIGRATIONS_FOLDER = APP_DIR / 'migrations'
+    # Mail
+    MAIL_SERVER = os.getenv('MAIL_SERVER')
+    MAIL_PORT = os.getenv('MAIL_PORT')
+    MAIL_USE_TLS = True
+    MAIL_USE_SSL = False
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = ('Flask Shop', 'Flask Shop')
+
+
+if __name__ == '__main__':
+    print(type(Config.APP_DIR))
+

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Input with Increment and Decrement Buttons</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Optional: Custom CSS styles */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        {% for item in 4 %}
+        <div class="input-group">
+            <input type="number" class="form-control quantity" id="quantity_{{ loop.index }}" value="{{ item }}" step="1">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary increase" type="button">+</button>
+                <button class="btn btn-outline-secondary decrease" type="button">-</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script>
+$(document).ready(function(){
+    $(".increase").click(function(){
+        var input = $(this).parent().prev();
+        var currentValue = parseInt(input.val());
+        input.val(currentValue + 1);
+    });
+
+    $(".decrease").click(function(){
+        var input = $(this).parent().prev();
+        var currentValue = parseInt(input.val());
+        if(currentValue > 1) {
+            input.val(currentValue - 1);
+        }
+    });
+});
+</script>
+</body>
+</html>

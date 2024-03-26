@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, g
 from flask_login import login_required, logout_user, current_user
 import uuid
 from backend.extensions import login_manager
@@ -18,6 +18,11 @@ def load_user(user_id):
         return User.query.get(user_id)
 
 
+def set_categories():
+    if 'categories' not in g:
+        g.categories = Categories.query.all()
+
+
 @public.route('/logout')
 @login_required
 def logout():
@@ -28,6 +33,5 @@ def logout():
 
 @public.route('/')
 def home():
-    categories = Categories.query.all()
     subcategory = Subcategory.query.limit(7)
-    return render_template('index.html', categories=categories, subcategory=subcategory)
+    return render_template('index.html', subcategory=subcategory)

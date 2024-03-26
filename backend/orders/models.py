@@ -1,4 +1,5 @@
 from urllib.parse import parse_qs
+from datetime import datetime
 
 from backend.extensions import db
 from backend.product.models import Products
@@ -20,6 +21,7 @@ class Orders(db.Model):
     entrance_number = db.Column(db.String(100), nullable=False)
     comment = db.Column(db.String(255), nullable=False)
     total_price = db.Column(db.Float, nullable=False)
+    order_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
     products = db.relationship('Products', secondary=orders_products, backref='orders', lazy=True)
 
     def __repr__(self):

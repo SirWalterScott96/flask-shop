@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block content %}
+<main>
+    <div class="container">
+        <div class="row gap-5">
+            <div class="col-3">
+                <ul class="nav nav-category">
+                    {% for category in categories %}
+                        <li class="nav-item border-bottom w-100 mb-3">
+                            <div class="d-flex justify-content-between align-items-center ">
+                                <a href="{{ url_for('product.category', category_id=category.id) }}"
+                                   class="category-link mb-2">{{ category.name }}</a>
+                                <i class="toggle-icon fas fa-chevron-down" data-bs-toggle="collapse"
+                                   data-bs-target="#category-{{ category.id }}" style="cursor: pointer"></i>
+                            </div>
+                            {% if category.id == category_id %}
+                                <ul class="list-group collapse show" id="category-{{ category.id }}">
+                            {% else %}
+                                <ul class="list-group collapse" id="category-{{ category.id }}">
+                            {% endif %}
+
+                            {% for subcategory in category.sub_category %}
+                                {% if subcategory.id == subcategory_id %}
+                                    <div class="list-group-item">
+                                        <a href="{{ url_for('product.subcategory', category_id=category.id, subcategory_id=subcategory.id) }}" class="category-link-small color-active">{{ subcategory.name }}</a>
+                                    </div>
+                                {% else %}
+                                    <div class="list-group-item">
+                                        <a href="{{ url_for('product.subcategory', category_id=category.id, subcategory_id=subcategory.id) }}" class="category-link-small">{{ subcategory.name }}</a>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="col-8">
+                {% if product %}
+                    <div class="row product-details" data-product-name="{{ product.name }}" data-product-id="{{ product.id }}">
+                        <div class="col-6">
+                            <img src="{{ url_for('static', filename=product.img_url) }}" alt="" class="img-fluid">
+                        </div>
+                        <div class="col-6">
+                            <h2 class="pb-2">{{ product.name }}</h2>
+                            <div style="white-space: pre-wrap; line-height: 25px" class="pb-4">{{ product.description }}</div>
+                            <div>
+                                <h3>Price: <strong class="product-price" data-price="{{ product.price }}">{{ product.price }}</strong> UAH</h3>
+                            </div>
+                            <div class="pb-3">
+                                <h4>Quantity in stock: {{ product.quantity }}</h4>
+                            </div>
+                            <div class="input-group pb-3">
+                                <div class="input-group-prepend">
+                                    <button  class="btn btn-color-green decrease" type="button">-</button>
+                                </div>
+                                <div class="col-3">
+                                    <input type="number" class="form-control text-center quantity-input" value="1" data-quantity-max="{{ product.quantity }}" min="1" oninput="this.value = Math.min(Math.max(this.value, 1), {{ product.quantity }});" style="height: 38px">
+                                </div>
+                                <div class="input-group-append">
+                                    <button  class="btn btn-color-green increase" type="button">+</button>
+                                </div>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-color-green addBtn">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <h1 class="my-5">Product doesn't exist</h1>
+                {% endif %}
+            </div>
+        </div>
+
+   </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function (){
+        var incrementButtons = $('.increase');
+        var decrementButtons = $('.decrease');
+
+
+        incrementButtons.on('click', function() {
+            var input = $(this).closest('.input-group').find('.quantity-input');
+            var value = parseInt(input.val(), 10);
+            if (parseInt(input.data('quantity-max'), 10) - 1 >= value) {
+                input.val(value + 1).trigger('change');
+            }
+            updateTotalAmount();
+        });
+
+        decrementButtons.on('click', function() {
+            var input = $(this).closest('.input-group').find('.quantity-input')
+            var value = parseInt(input.val(), 10);
+            if (value > 1) {
+                input.val(value - 1).trigger('change');
+            }
+            updateTotalAmount();
+        });
+
+        function updateTotalAmount() {
+            var totalAmount = 0;
+
+            var price = parseFloat($('.product-price').attr('data-price'));
+            var quantity = parseInt($('.quantity-input').val());
+            totalAmount += price * quantity;
+            $('.product-price').text(totalAmount.toFixed(2));
+        }
+
+        $('.addBtn').on('click', function (){
+            console.log(1);
+            var product_data = {
+                product_name: $('.product-details').attr('data-product-name'),
+                product_id: $('.product-details').attr('data-product-id'),
+                quantity: $('.quantity-input').val(),
+            };
+
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: '/orders/add-to-cart',
+                data: JSON.stringify(product_data),
+                dataType: 'json',
+                success: function(response) {
+                    console.log(1);
+                    $('.icon-cart')
+                        .append('<style>.icon-cart::before { opacity: 1; }</style>')
+                        .attr('data-cart-content', response.quantity_in_card);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

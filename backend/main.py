@@ -8,7 +8,7 @@ from backend.extensions import (
 )
 from backend.user.views import user
 from backend.orders.views import orders
-from backend.public.views import public
+from backend.public.views import public, set_categories
 from backend.product.views import product
 from backend.admin.views import admin
 from backend.admin import commands
@@ -19,6 +19,7 @@ def create_app(config_object=Config):
     app.config.from_object(config_object)
     register_extensions(app)
     register_blueprints(app)
+    register_before_request(app)
     register_commands(app)
     return app
 
@@ -40,6 +41,10 @@ def register_blueprints(app):
 def register_commands(app):
     """Register Click commands."""
     app.cli.add_command(commands.init_admin)
+
+
+def register_before_request(app):
+    app.before_request(set_categories)
 
 
 if __name__ == '__main__':

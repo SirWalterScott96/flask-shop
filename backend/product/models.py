@@ -1,3 +1,5 @@
+from flask import render_template, redirect, url_for
+
 from backend.extensions import db
 
 
@@ -43,3 +45,24 @@ class Products(db.Model):
 
     def __repr__(self):
         return f"Product('{self.name}', '{self.price}', '{self.quantity}')"
+
+
+class ValidateProduct:
+    def __init__(self, product_name):
+        self.product = self.set_product_by_name(product_name)
+
+    def set_product_by_name(self, product_name):
+        return Products.query.filter_by(name=product_name).first()
+
+    def get_product_page(self):
+        if self.product:
+            return redirect(url_for('product.show_product', product_id=self.product.id,
+                                    subcategory_id=self.product.subcategory.id,
+                                    category_id=self.product.subcategory.categories.id))
+        else:
+            return render_template('product.html')
+
+
+
+
+

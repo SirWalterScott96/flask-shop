@@ -11,7 +11,6 @@ orders = Blueprint('orders', __name__, template_folder='../templates/orders')
 def cart():
     cart: dict = {Products.query.filter_by(id=int(data['product_id'])).first(): data['quantity']
                   for name, data in session['cart'].items()}
-
     return render_template('orders.html', cart=cart)
 
 
@@ -23,16 +22,15 @@ def add_to_cart():
     session_cart_dict = session.get('cart', {})
 
     if data['product_name'] in session_cart_dict:
-        session_cart_dict[data['product_name']]['quantity'] += 1
+        session_cart_dict[data['product_name']]['quantity'] += 1 if not 'quantity' in data else int(data['quantity'])
     else:
         session_cart_dict[data['product_name']] = {'product_id': data['product_id'],
-                                                   'quantity': 1 if 'quantity' not in data else data['quantity']}
+                                                   'quantity': 1 if 'quantity' not in data else int(data['quantity'])}
     session['cart'] = session_cart_dict
 
     return jsonify(quantity_in_card=len(session['cart']))
 
 
-# TODO add datatime when create order
 @orders.route('/submit-order', methods=['POST'])
 def submit_order():
     if request.method == 'POST' and OrderForm.validate_data(request.json):
@@ -45,6 +43,16 @@ def submit_order():
     return 'success'
 
 
+@orders.route('/delete-from-cart', methods=['DELETE'])
+def delete_from_cart():
+    if request.method == 'DELETE':
+        request_data = request.get_json()
+        session_cart_dict = session.get('cart', {})
+        session_cart_dict.pop(request_data['product_name'])
+        session['cart'] = session_cart_dict
+    return jsonify(quantity_in_card=len(session['cart']))
+
+
 @orders.route('/success')
 def success_order():
-    return 'Hello World'
+    return render_template('success.html')

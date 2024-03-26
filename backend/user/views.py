@@ -53,6 +53,11 @@ def user_register():
 
 
 @login_required
+@user.route('/settings')
+def user_settings():
+    pass
+
+@login_required
 @user.route('/user-dashboard')
 def user_dashboard():
     return render_template('user-dashboard.html')

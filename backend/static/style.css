@@ -469,3 +469,31 @@ nav ul {
   color: #e74c3c;
   visibility: visible;
 }
+
+
+/*SEACH BOX*/
+.search-result-box {
+  position: absolute;
+  z-index: 50;
+  background-color: white;
+  width: 98%;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 2px rgba(145,158,171,.2),
+              0 12px 24px -4px rgba(145,158,171,.12);
+}
+
+.search-result-box ul {
+  padding: 15px 10px;
+  margin-bottom: 0;
+}
+
+.search-result-box ul li {
+  list-style: none;
+  border-radius: 0.5rem;
+  padding: 15px 10px;
+  transition: all 0.2s;
+}
+
+.search-result-box ul li:hover {
+  background-color: #e3e3e3;
+}

@@ -1,12 +1,18 @@
 from functools import wraps
 
 from flask import Blueprint, render_template, redirect, flash, url_for
-from flask_login import login_user, current_user, login_required
+from flask_login import login_user, current_user, login_required, logout_user
 
 from .forms import UserLoginForm, UserRegisterForm
-from .models import User
+from backend.extensions import db, login_manager
+from backend.mail.classes import EmailSender
 
 user = Blueprint('user', __name__, template_folder='../templates/user')
+
+
+@login_manager.unauthorized_handler
+def unauthorized_callback():
+    return redirect(url_for('user.user_login'))
 
 
 def is_active_user(func):
@@ -31,33 +37,37 @@ def user_login():
     return render_template('login.html', form=form)
 
 
-@user.route('/register')
+@user.route('/register', methods=['GET', 'POST'])
 @is_active_user
 def user_register():
     """Register new user."""
     form = UserRegisterForm()
 
     if form.validate_on_submit():
-        # TODO realize if username, write that username is used, ajax
-        new_user = User(name=form.name.data,
-                        username=form.username.data,
-                        password=generate_password_hash(form.password.data),
-                        email=form.email.data)
-        db.session.add(new_user)
+        db.session.add(form.user)
         db.session.commit()
-        send_confirmation_email(form.email.data, new_user.id)
-
+        EmailSender.send_confirmation_email(form.email.data)
         flash('A confirmation code has been sent to your email', 'success')
         return redirect(url_for('user.user_login'))
     return render_template('register.html', form=form)
 
 
+@user.route('/logout')
 @login_required
+def logout():
+    """Logout."""
+    logout_user()
+    return redirect(url_for('public.home'))
+
+
 @user.route('/settings')
+@login_required
 def user_settings():
     pass
 
-@login_required
+
 @user.route('/user-dashboard')
+@login_required
 def user_dashboard():
+    print(current_user.is_active)
     return render_template('user-dashboard.html')

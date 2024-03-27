@@ -5,8 +5,10 @@ from backend.extensions import (
     login_manager,
     migrate,
     db,
+    mail,
 )
 from backend.user.views import user
+from backend.mail.views import email
 from backend.orders.views import orders
 from backend.public.views import public, set_categories
 from backend.product.views import product
@@ -28,6 +30,7 @@ def register_extensions(app):
     login_manager.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db, directory=app.config.get('MIGRATIONS_FOLDER'))
+    mail.init_app(app)
 
 
 def register_blueprints(app):
@@ -36,6 +39,7 @@ def register_blueprints(app):
     app.register_blueprint(product, url_prefix='/product')
     app.register_blueprint(admin, url_prefix='/admin')
     app.register_blueprint(orders, url_prefix='/orders')
+    app.register_blueprint(email, url_prefix='/email')
 
 
 def register_commands(app):

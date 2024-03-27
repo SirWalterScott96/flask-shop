@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from datetime import timedelta
 from flask.helpers import get_debug_flag
 from pathlib import Path
+
 load_dotenv()
 
 
@@ -29,7 +30,4 @@ class Config:
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = ('Flask Shop', 'Flask Shop')
 
-
-if __name__ == '__main__':
-    print(type(Config.APP_DIR))
-
+    LOGIN_REDIRECT_URL = '/user/login'

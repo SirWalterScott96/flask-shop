@@ -23,14 +23,6 @@ def set_categories():
         g.categories = Categories.query.all()
 
 
-@public.route('/logout')
-@login_required
-def logout():
-    """Logout."""
-    logout_user()
-    return redirect(url_for('public.home'))
-
-
 @public.route('/')
 def home():
     subcategory = Subcategory.query.limit(7)

@@ -49,3 +49,26 @@ class UserRegisterForm(FlaskForm):
     username = StringField(validators=[DataRequired()])
     password = PasswordField(validators=[DataRequired()])
     email = EmailField(validators=[DataRequired()])
+
+    def __init__(self, *args, **kwargs):
+        """Create instance."""
+        super().__init__(*args, **kwargs)
+        self.user = None
+
+    def validate(self, extra_validators=None):
+        """Validate the form."""
+        initial_validation = super(UserRegisterForm, self).validate(extra_validators)
+        if not initial_validation:
+            return False
+
+        username = User.query.filter_by(username=self.username.data).first()
+
+        if username:
+            flash('username already exist', 'danger')
+            return False
+
+        self.user = User(name=self.name.data,
+                         username=self.username.data,
+                         password=self.password.data,
+                         email=self.email.data)
+        return True

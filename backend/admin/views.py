@@ -22,7 +22,6 @@ def only_admin_access(func):
             return func(*args, **kwargs)
         else:
             return redirect(url_for('public.home'))
-
     return wrapper
 
 

@@ -17,7 +17,6 @@ class EmailSender:
 
     @classmethod
     def send_confirmation_email(cls, user_email):
-        print(user_email)
         subject = 'Confirm Your Registration'
         token = cls.serializer.dumps(user_email, salt='email-confirm')
         confirmation_url = url_for('email.confirm_email', user_email=user_email, token=token, _external=True)

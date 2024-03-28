@@ -38,7 +38,7 @@
                     <form action="{{ url_for('user.user_login') }}" method="POST">
                         {{ form.csrf_token }}
                         <div class="mb-3">
-                            <label class="form-label">Name</label>
+                            <label class="form-label">Username</label>
                             {{ form.username(class="form-control") }}
                         </div>
                         <div class="mb-3">

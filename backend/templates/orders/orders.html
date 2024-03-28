@@ -40,7 +40,7 @@
                         <textarea class="form-control order-form" placeholder="Order comment" name="comment"></textarea>
                     </div>
                     <div class="col-12">
-                        <button type="submit" class="btn btn-color-green submit-order" style="width: 100%">Make an order</button>
+                        <button type="button" class="btn btn-color-green submit-order" style="width: 100%">Make an order</button>
                     </div>
                 </div>
             </form>
@@ -213,7 +213,7 @@ $(document).ready(function() {
             data: JSON.stringify(requestData),
             contentType: 'application/json',
             success: function() {
-                window.location.href = '/orders/success'
+                window.location.href = '/orders/success';
             },
             error: function(xhr, status, error) {
                 if (xhr.status === 400) {

@@ -20,4 +20,9 @@ class OrderForm:
         if not email or not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
             abort(400)
 
+        phone_number = email = parse_qs(request_data['formData']).get('phone_number')[0]
+
+        if len(phone_number) != 12:
+            abort(400)
+
         return True

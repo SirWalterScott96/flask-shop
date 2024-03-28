@@ -1,5 +1,6 @@
 from urllib.parse import parse_qs
 from datetime import datetime
+from flask_login import current_user
 
 from backend.extensions import db
 from backend.product.models import Products
@@ -23,6 +24,8 @@ class Orders(db.Model):
     total_price = db.Column(db.Float, nullable=False)
     order_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
     products = db.relationship('Products', secondary=orders_products, backref='orders', lazy=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
 
     def __repr__(self):
         return f"Orders('{self.name}', '{self.email}', '{self.phone_number}', '{self.street}', '{self.house_number}'," \
@@ -80,7 +83,8 @@ class CreateOrder(Orders):
             house_number=self.house_number,
             entrance_number=self.entrance_number,
             comment=self.comment,
-            total_price=self.total_price
+            total_price=self.total_price,
+            user_id=current_user.id if current_user.is_active else None
         )
 
         db.session.add(self.new_order)

@@ -12,6 +12,8 @@ class User(db.Model, UserMixin):
     _password = db.Column(db.String(100))
     email_confirmed = db.Column(db.Boolean(), default=False)
 
+    orders = db.relationship('Orders', backref='user', lazy=True)
+
     def __init__(self, name, username, email, password, **kwargs):
         super().__init__(name=name, username=username, email=email, password=password, **kwargs)
 

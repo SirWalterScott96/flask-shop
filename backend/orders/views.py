@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, request, jsonify, abort
+from flask import Blueprint, render_template, session, request, jsonify, abort, redirect
 
 from backend.product.models import Products
 from .models import CreateOrder
@@ -40,7 +40,9 @@ def submit_order():
         new_order.set_form_data_to_orders()
         new_order.save()
 
-    return 'success'
+        session['cart']: dict = {}
+
+    return redirect('/orders/success')
 
 
 @orders.route('/delete-from-cart', methods=['DELETE'])

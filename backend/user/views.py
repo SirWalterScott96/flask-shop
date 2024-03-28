@@ -62,12 +62,12 @@ def logout():
 
 @user.route('/settings')
 @login_required
-def user_settings():
-    pass
+def settings():
+    return redirect(url_for('user.dashboard', child=settings))
 
 
-@user.route('/user-dashboard')
+@user.route('/dashboard')
+@user.route('/dashboard/<child>')
 @login_required
-def user_dashboard():
-    print(current_user.is_active)
-    return render_template('user-dashboard.html')
+def dashboard(child=None):
+    return render_template('dashboard.html')

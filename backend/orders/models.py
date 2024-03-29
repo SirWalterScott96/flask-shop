@@ -27,6 +27,10 @@ class Orders(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
 
+    @staticmethod
+    def get_all_user_orders(user):
+        pass
+
     def __repr__(self):
         return f"Orders('{self.name}', '{self.email}', '{self.phone_number}', '{self.street}', '{self.house_number}'," \
                f" '{self.entrance_number}', '{self.comment}', '{self.total_price}')"
@@ -95,7 +99,8 @@ class CreateOrder(Orders):
     def add_products_and_quantity_to_order(self):
         for product, quantity in self.product_dict.items():
             order_products = orders_products.insert().values(order_id=self.new_order.id,
-                                                             product_id=product.id, quantity=quantity)
+                                                             product_id=product.id,
+                                                             quantity=quantity)
             db.session.execute(order_products)
 
         db.session.commit()

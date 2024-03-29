@@ -1,53 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Number Input with Increment and Decrement Buttons</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        /* Optional: Custom CSS styles */
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        input[type="number"] {
-            -moz-appearance: textfield;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Table</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
+  <style>
+    .table thead th {
+        border-top: none;
+      background-color: #f0f3f2; /* колір тексту для головних колонок */
+    }
+  </style>
 <body>
-    <div class="container mt-5">
-        {% for item in 4 %}
-        <div class="input-group">
-            <input type="number" class="form-control quantity" id="quantity_{{ loop.index }}" value="{{ item }}" step="1">
-            <div class="input-group-append">
-                <button class="btn btn-outline-secondary increase" type="button">+</button>
-                <button class="btn btn-outline-secondary decrease" type="button">-</button>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script>
-$(document).ready(function(){
-    $(".increase").click(function(){
-        var input = $(this).parent().prev();
-        var currentValue = parseInt(input.val());
-        input.val(currentValue + 1);
-    });
+<div class="container">
+  <h2>Order Table</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Order Id</th>
+        <th>Date</th>
+        <th>Items</th>
+        <th>Amount</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>2024-03-29</td>
+        <td>Item 1, Item 2</td>
+        <td>$100</td>
+        <td><button class="btn btn-primary" data-toggle="collapse" data-target="#orderDetails1">See details</button></td>
+      </tr>
+      <tr id="orderDetails1" class="collapse">
+        <td colspan="5">
+          <div class="card card-body">
+            <h4>Order Details</h4>
+            <p>Details for order 1 go here...</p>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>2024-03-30</td>
+        <td>Item 3, Item 4</td>
+        <td>$150</td>
+        <td><button class="btn btn-primary" data-toggle="collapse" data-target="#orderDetails2">See details</button></td>
+      </tr>
+      <tr id="orderDetails2" class="collapse">
+        <td colspan="5">
+          <div class="card card-body">
+            <h4>Order Details</h4>
+            <p>Details for order 2 go here...</p>
 
-    $(".decrease").click(function(){
-        var input = $(this).parent().prev();
-        var currentValue = parseInt(input.val());
-        if(currentValue > 1) {
-            input.val(currentValue - 1);
-        }
-    });
-});
-</script>
+          </div>
+        </td>
+      </tr>
+      <!-- Add more rows as needed -->
+    </tbody>
+  </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
 </html>

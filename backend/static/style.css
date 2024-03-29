@@ -471,7 +471,7 @@ nav ul {
 }
 
 
-/*SEACH BOX*/
+/*SEARCH BOX*/
 .search-result-box {
   position: absolute;
   z-index: 50;
@@ -496,4 +496,47 @@ nav ul {
 
 .search-result-box ul li:hover {
   background-color: #e3e3e3;
+}
+
+
+/*DASHBOARD*/
+
+.dashboard-nav-container {
+  padding-right: 50px;
+}
+
+.nav-link {
+  border-radius: 0.5rem !important;
+  color: #21313c !important;
+  padding: 0.75rem 0.75rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.active {
+  background-color: #001e2b !important;
+  color: #fff !important;
+}
+
+table {
+  border-radius: 5px 5px 0 0;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+table thead tr {
+  border-top: none;
+  background-color: #f0f3f2;
+}
+
+tr,
+th {
+  padding: 12px 15px !important;
+}
+
+tbody tr {
+    height: 65px;
+}
+
+td, th {
+    vertical-align: middle;
 }

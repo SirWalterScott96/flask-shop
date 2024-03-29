@@ -2,10 +2,13 @@ from functools import wraps
 
 from flask import Blueprint, render_template, redirect, flash, url_for
 from flask_login import login_user, current_user, login_required, logout_user
+from collections import defaultdict
 
 from .forms import UserLoginForm, UserRegisterForm
 from backend.extensions import db, login_manager
 from backend.mail.classes import EmailSender
+from backend.orders.models import Orders, orders_products
+from .models import User
 
 user = Blueprint('user', __name__, template_folder='../templates/user')
 
@@ -70,4 +73,13 @@ def settings():
 @user.route('/dashboard/<child>')
 @login_required
 def dashboard(child=None):
-    return render_template('dashboard.html')
+    user = User.query.get_or_404(1)
+    order_quantities_dict = defaultdict(list)
+    for order in user.orders:
+        products = order.products
+        for product in products:
+            quantity = db.session.query(orders_products.c.quantity).filter_by(order_id=order.id,
+                                                                              product_id=product.id).scalar()
+            order_quantities_dict[order.id].append(quantity)
+
+    return render_template('dashboard.html', order_quantities_dict=order_quantities_dict)

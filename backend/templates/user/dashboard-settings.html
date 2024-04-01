@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block content %}
+    <main>
+        <div class="container">
+            <div class="row">
+                <div class="col-3 border-end">
+                    <div class="pt-5 dashboard-nav-container">
+                        <ul class="nav flex-column nav-pills nav-pills-dark">
+                            <li class="nav-item">
+                                <a href="{{ url_for('user.dashboard_orders') }}" class="nav-link d-flex align-items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                                        <g fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"
+                                           stroke-width="2">
+                                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4ZM3 6h18"></path>
+                                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                        </g>
+                                    </svg>
+                                    Your Orders
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active d-flex align-items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                                        <path fill="white" fill-rule="evenodd"
+                                              d="M9 3.223a1 1 0 0 1 .777-.975a9.99 9.99 0 0 1 4.445.002a1 1 0 0 1 .778.975v1.847a1 1 0 0 0 1.5.866l1.601-.925a1 1 0 0 1 1.234.187a10.064 10.064 0 0 1 2.221 3.848a1 1 0 0 1-.455 1.162l-1.601.924a1 1 0 0 0 0 1.732l1.6.923a1 1 0 0 1 .455 1.161a9.99 9.99 0 0 1-2.22 3.851a1 1 0 0 1-1.234.186l-1.601-.925a1 1 0 0 0-1.5.866v1.85a1 1 0 0 1-.778.974a9.991 9.991 0 0 1-4.445-.002A1 1 0 0 1 9 20.775v-1.847a1 1 0 0 0-1.5-.866l-1.601.925a1 1 0 0 1-1.234-.187A10.029 10.029 0 0 1 3.34 17a10.028 10.028 0 0 1-.896-2.048a1 1 0 0 1 .455-1.162l1.6-.924a1 1 0 0 0 0-1.732l-1.598-.923a1 1 0 0 1-.456-1.161a9.99 9.99 0 0 1 2.22-3.85a1 1 0 0 1 1.233-.187l1.602.925A1 1 0 0 0 9 5.072zM12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6"
+                                              clip-rule="evenodd"></path>
+                                    </svg>
+                                    Settings
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link d-flex align-items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                                        <path fill="black"
+                                              d="M12 11.5A2.5 2.5 0 0 1 9.5 9A2.5 2.5 0 0 1 12 6.5A2.5 2.5 0 0 1 14.5 9a2.5 2.5 0 0 1-2.5 2.5M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7"></path>
+                                    </svg>
+                                    Address
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link d-flex align-items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                                        <path fill="black"
+                                              d="M20 8H4V6h16m0 12H4v-6h16m0-8H4c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2"></path>
+                                    </svg>
+                                    Payment Method
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link d-flex align-items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                                        <path fill="black"
+                                              d="M8.645 20.5a3.502 3.502 0 0 0 6.71 0zM3 19.5h18v-3l-2-3v-5a7 7 0 1 0-14 0v5l-2 3z"></path>
+                                    </svg>
+                                    Notification
+                                </a>
+                            </li>
+                            <hr>
+                            <li class="nav-item">
+                                <a href="{{ url_for('user.logout') }}" class="nav-link d-flex align-items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                                        <path fill="black"
+                                              d="M3 21V3h9v2H5v14h7v2zm13-4l-1.375-1.45l2.55-2.55H9v-2h8.175l-2.55-2.55L16 7l5 5z"></path>
+                                    </svg>
+                                    Log out
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-8">
+                    <div class="p-lg-5">
+                        <div class="pb-5 border-bottom">
+                            <h2 class="mb-5">Account Setting</h2>
+                            <h5>Account details</h5>
+                            <form action="#" class="mt-3">
+                                <div class="col-12 alert alert-danger alert-dismissible fade show" id="formError" style="display: none"></div>
+                                <div class="col-6">
+                                    <div class="form-control-custom">
+                                        <div class="mb-3">
+                                            <label for="name" class="form-label">Name</label>
+                                            <input type="text" class="form-control order-form" placeholder="Your name" name="name" id="name" value="{{ current_user.name }}">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="phone" class="form-label">Phone</label>
+                                            <input type="text" class="form-control order-form" placeholder="Phone number" name="phone" id="phone">
+                                        </div>
+                                        <button type="button" class="btn btn-color-green">Save Details</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="py-5">
+                            <h5>Password</h5>
+                            <form action="#" class="mt-3">
+                                <div class="row row-cols-lg-2 g-4">
+                                    <div class="col-12 alert alert-danger alert-dismissible fade show" id="formErrorPassword" style="display: none"></div>
+                                    <div class="col form-control-custom">
+                                        <label for="newPassword" class="form-label">New Password</label>
+                                        <input type="password" class="form-control order-form" placeholder="*********" name="new-password" id="newPassword" required>
+                                    </div>
+                                    <div class="col form-control-custom">
+                                        <label for="currentPassword" class="form-label">Current Password</label>
+                                        <input type="password" class="form-control order-form" placeholder="*********" name="current-password" id="currentPassword" required>
+                                    </div>
+                                </div>
+                                <div class="mt-2 d-flex flex-column gap-2">
+                                    <p>Can't remember your current password?</p>
+                                    <a href="#" class="link-color">Reset your password</a>
+                                    <div>
+                                        <button type="button" class="btn btn-color-green mt-2">Save Password</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+{% endblock %}

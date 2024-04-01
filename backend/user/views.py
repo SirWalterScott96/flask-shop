@@ -63,23 +63,23 @@ def logout():
     return redirect(url_for('public.home'))
 
 
-@user.route('/settings')
+@user.route('/dashboard/settings')
 @login_required
-def settings():
-    return redirect(url_for('user.dashboard', child=settings))
+def dashboard_settings():
+    return render_template('dashboard-settings.html')
 
 
-@user.route('/dashboard')
-@user.route('/dashboard/<child>')
+
+@user.route('/dashboard/orders')
 @login_required
-def dashboard(child=None):
-    user = User.query.get_or_404(1)
+def dashboard_orders():
+
     order_quantities_dict = defaultdict(list)
-    for order in user.orders:
+    for order in current_user.orders:
         products = order.products
         for product in products:
             quantity = db.session.query(orders_products.c.quantity).filter_by(order_id=order.id,
                                                                               product_id=product.id).scalar()
             order_quantities_dict[order.id].append(quantity)
 
-    return render_template('dashboard.html', order_quantities_dict=order_quantities_dict)
+    return render_template('dashboard-orders.html', order_quantities_dict=order_quantities_dict)

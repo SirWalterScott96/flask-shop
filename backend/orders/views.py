@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, request, jsonify, abort, redirect
+from flask import Blueprint, render_template, session, request, jsonify, abort, redirect, g
 
 from backend.product.models import Products
 from .models import CreateOrder
@@ -9,9 +9,10 @@ orders = Blueprint('orders', __name__, template_folder='../templates/orders')
 
 @orders.route('/')
 def cart():
-    cart: dict = {Products.query.filter_by(id=int(data['product_id'])).first(): data['quantity']
-                  for name, data in session['cart'].items()}
-    return render_template('orders.html', cart=cart)
+    if 'cart' in session:
+        g.cart: dict = {Products.query.filter_by(id=int(data['product_id'])).first(): data['quantity']
+                        for name, data in session['cart'].items()}
+    return render_template('orders.html')
 
 
 @orders.route('/add-to-cart', methods=['POST'])

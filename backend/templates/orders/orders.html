@@ -50,7 +50,8 @@
         <div class="col">
             <h5 class="text-uppercase">cart</h5>
             <ul class="list-group gap-3 border-bottom pb-4">
-                {% for product, quantity in cart.items() %}
+                {% if g.cart %}
+                {% for product, quantity in g.cart.items() %}
                     <li class="list-group-item d-flex flex-row align-items-center" style="height: 100px" data-product-id="{{ product.id }}">
                         <img src="{{ url_for('static', filename=product.img_url) }}" alt="" class="img-fluid" style="max-height: 100px;">
                         <div class="col-6">
@@ -78,6 +79,9 @@
             </ul>
             <h5 class="mt-4">Order amount</h5>
             <h4><strong class="total-amount"></strong> UAH</h4>
+            {% else %}
+                <h2>Oops, there are no products in cart 😭</h2>
+            {% endif %}
         </div>
     </div>
 </div>

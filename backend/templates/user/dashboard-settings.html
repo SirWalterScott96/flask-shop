@@ -82,11 +82,17 @@
                                             <input type="text" class="form-control order-form" placeholder="Your name" name="name" id="name" value="{{ current_user.name }}">
                                         </div>
 
-                                        <div class="mb-3">
-                                            <label for="phone" class="form-label">Phone</label>
-                                            <input type="text" class="form-control order-form" placeholder="Phone number" name="phone" id="phone">
+                                        <label for="phone" class="form-label">Phone</label>
+                                        <div class="mb-3 form-control-custom">
+                                            {% set phone_number = current_user.phone_number %}
+                                            <input type="number" class="form-control order-form phone" placeholder="Phone number" name="phone" id="phone_number" value="{{ phone_number }}">
+                                            <i class="fas fa-check-circle"></i>
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            <small>Error message</small>
                                         </div>
-                                        <button type="button" class="btn btn-color-green">Save Details</button>
+                                        <div class="save-details d-flex justify-content-between pt-2">
+                                            <button type="button" class="btn btn-color-green btn-acc">Save Details</button>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -94,7 +100,7 @@
 
                         <div class="py-5">
                             <h5>Password</h5>
-                            <form action="#" class="mt-3">
+                            <form class="mt-3 acc-form">
                                 <div class="row row-cols-lg-2 g-4">
                                     <div class="col-12 alert alert-danger alert-dismissible fade show" id="formErrorPassword" style="display: none"></div>
                                     <div class="col form-control-custom">
@@ -108,9 +114,9 @@
                                 </div>
                                 <div class="mt-2 d-flex flex-column gap-2">
                                     <p>Can't remember your current password?</p>
-                                    <a href="#" class="link-color">Reset your password</a>
-                                    <div>
-                                        <button type="button" class="btn btn-color-green mt-2">Save Password</button>
+                                    <a href="{{ url_for('user.reset_password') }}" class="link-color">Reset your password</a>
+                                    <div class="save-password d-flex gap-3 pt-2 align-items-center">
+                                        <button type="button" class="btn btn-color-green mt-2 btn-password">Save Password</button>
                                     </div>
                                 </div>
                             </form>
@@ -121,4 +127,111 @@
         </div>
 
     </main>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+    $(document).ready(function () {
+        function isValidPhoneNumber(phoneNumber) {
+            var cleanedPhoneNumber = phoneNumber.replace(/\D/g, '');
+            return cleanedPhoneNumber.length === 12;
+        }
+
+        function checkFieldValidity(input, validator, errorMessage) {
+            var inputValue = input.val();
+            var isValid = validator(inputValue);
+            if (!isValid) {
+                setErrorFor(input, errorMessage);
+            } else {
+                setSuccessFor(input);
+            }
+        }
+
+        function setErrorFor(input, message) {
+            var errorMessageElement = input.siblings('small');
+            errorMessageElement.text(message);
+            var formControl = input.closest('.form-control-custom');
+            formControl.addClass('error').removeClass('success');
+        }
+
+        function setSuccessFor(input) {
+            var formControl = input.closest('.form-control-custom');
+            formControl.removeClass('error').addClass('success');
+        }
+
+        $('#phone_number').blur(function() {
+            checkFieldValidity($(this), isValidPhoneNumber, 'Incorrect phone number, should start with 380.');
+        });
+
+        $('.btn-acc').on('click', function () {
+            var requestData = {
+                name: $('#name').val(),
+                phone_number: $('#phone_number').val()
+            }
+
+            $.ajax({
+                type: 'PUT',
+                url: '/user/set-account-details',
+                data: JSON.stringify(requestData),
+                contentType: 'application/json',
+                success: function () {
+                    $('.save-details').append('<div class="alert-custom">' + 'Success' + '</div>');
+
+                    setTimeout(function () {
+                        $('.alert-custom').fadeOut(500, function () {
+                            $(this).remove();
+                        });
+                    }, 1000);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.status == 400) {
+                        $('.save-details').append('<div class="alert-custom-danger">' + 'Bad data' + '</div>');
+
+                        setTimeout(function () {
+                            $('.alert-custom-danger').fadeOut(500, function () {
+                                $(this).remove();
+                            });
+                        }, 1000);
+                    }
+                }
+            });
+        });
+    });
+    </script>
+    <script>
+    $(document).ready(function () {
+        $('.btn-password').on('click', function () {
+            var requestData = {
+                new_password: $('#newPassword').val(),
+                current_password: $('#currentPassword').val()
+            }
+            $.ajax({
+                type: 'PUT',
+                url: '/user/set-new-password',
+                data: JSON.stringify(requestData),
+                contentType: 'application/json',
+                success: function () {
+                    $('.save-password').append('<div class="alert-custom">' + 'Password saved successfully' + '</div>');
+
+                    setTimeout(function () {
+                        $('.alert-custom').fadeOut(500, function () {
+                            $(this).remove();
+                        });
+                    }, 3000);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.status >= 400) {
+                        $('.save-password').append('<div class="alert-custom-danger">' + 'Bad data' + '</div>');
+
+                        setTimeout(function () {
+                            $('.alert-custom-danger').fadeOut(500, function () {
+                                $(this).remove();
+                            });
+                        }, 3000);
+                    }
+                }
+            })
+        });
+    });
+    </script>
 {% endblock %}

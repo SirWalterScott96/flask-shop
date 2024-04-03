@@ -157,6 +157,16 @@ input[type='checkbox']:checked{
   border-color: #badbcc;
 }
 
+.alert-custom-danger {
+  align-self: center;
+  padding: 5px 15px;
+  color: #842029;
+  background-color: #f8d7da;
+  border: 1px solid transparent;
+  border-color: #f5c2c7;
+  border-radius: 0.25rem;
+}
+
 .card-subcategory{
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, .125);

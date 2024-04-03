@@ -23,7 +23,7 @@ def add_to_cart():
     session_cart_dict = session.get('cart', {})
 
     if data['product_name'] in session_cart_dict:
-        session_cart_dict[data['product_name']]['quantity'] += 1 if not 'quantity' in data else int(data['quantity'])
+        session_cart_dict[data['product_name']]['quantity'] += 1 if 'quantity' not in data else int(data['quantity'])
     else:
         session_cart_dict[data['product_name']] = {'product_id': data['product_id'],
                                                    'quantity': 1 if 'quantity' not in data else int(data['quantity'])}

@@ -1,14 +1,13 @@
-from functools import wraps
-
-from flask import Blueprint, render_template, redirect, flash, url_for
+from flask import Blueprint, render_template, redirect, flash, url_for, request, abort
 from flask_login import login_user, current_user, login_required, logout_user
 from collections import defaultdict
+from functools import wraps
 
 from .forms import UserLoginForm, UserRegisterForm
 from backend.extensions import db, login_manager
 from backend.mail.classes import EmailSender
 from backend.orders.models import Orders, orders_products
-from .models import User
+from .models import User, Account, SaveProperties
 
 user = Blueprint('user', __name__, template_folder='../templates/user')
 
@@ -69,11 +68,9 @@ def dashboard_settings():
     return render_template('dashboard-settings.html')
 
 
-
 @user.route('/dashboard/orders')
 @login_required
 def dashboard_orders():
-
     order_quantities_dict = defaultdict(list)
     for order in current_user.orders:
         products = order.products
@@ -83,3 +80,31 @@ def dashboard_orders():
             order_quantities_dict[order.id].append(quantity)
 
     return render_template('dashboard-orders.html', order_quantities_dict=order_quantities_dict)
+
+
+@user.route('/set-account-details', methods=['PUT'])
+@login_required
+def set_account_details():
+    account = Account()
+    if request.method == 'PUT' and account.account_details_validation(request.json):
+        save_properties = SaveProperties(current_user.id)
+        save_properties.set_new_account_details(name=account.name, phone_number=account.phone_number)
+        return '', 200
+    abort(400)
+
+
+@user.route('/set-new-password', methods=['PUT'])
+@login_required
+def set_new_password():
+    account = Account()
+    if request.method == 'PUT' and account.new_password_validation(request.json, current_user.id):
+        save_properties = SaveProperties(current_user.id)
+        save_properties.set_new_password(account.new_password)
+        return '', 200
+    abort(400)
+
+
+@user.route('/reset-password', methods=['GET', 'POST'])
+
+def reset_password():
+    return render_template('reset-password.html')

@@ -72,3 +72,5 @@ class UserRegisterForm(FlaskForm):
                          password=self.password.data,
                          email=self.email.data)
         return True
+
+

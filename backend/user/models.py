@@ -31,7 +31,7 @@ class User(db.Model, UserMixin):
         return bcrypt.check_password_hash(self._password.encode('UTF-8'), value)
 
     @staticmethod
-    def is_user_exist_by_email(email):
+    def get_user_by_email(email):
         return User.query.filter_by(email=email).first()
 
     @staticmethod
@@ -68,7 +68,6 @@ class Account:
             abort(400)
         user = User.query.get_or_404(user_id)
         if user and user.check_password(data['current_password']):
-            print(1)
             self.new_password = data['new_password']
             return True
         else:
@@ -81,6 +80,15 @@ class Account:
         else:
             phone_number_to_check = phone
         return phone_number_to_check
+
+    @staticmethod
+    def email_validation(data: dict):
+        if 'email' not in data:
+            abort(400)
+
+        if not User.get_user_by_email(data['email']):
+            abort(404, 'User not found with the provided email address')
+        return True
 
 
 class SaveProperties:

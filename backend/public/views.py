@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, redirect, url_for, g
-from flask_login import login_required, logout_user, current_user
+from flask import Blueprint, render_template, g
+from sqlalchemy.sql.expression import func
 import uuid
+
 from backend.extensions import login_manager
 from backend.product.models import Categories, Subcategory
 from backend.user.models import User
@@ -25,5 +26,5 @@ def set_categories():
 
 @public.route('/')
 def home():
-    subcategory = Subcategory.query.limit(7)
+    subcategory = Subcategory.query.order_by(func.random()).limit(7).all()
     return render_template('index.html', subcategory=subcategory)

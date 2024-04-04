@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, flash, url_for, request, abort
+from flask import Blueprint, render_template, redirect, flash, url_for, request, abort, session
 from flask_login import login_user, current_user, login_required, logout_user
 from collections import defaultdict
 from functools import wraps
@@ -29,7 +29,6 @@ def is_active_user(func):
 
 
 @user.route('/login', methods=['GET', 'POST'])
-@is_active_user
 def user_login():
     """login page."""
     form = UserLoginForm()
@@ -104,7 +103,30 @@ def set_new_password():
     abort(400)
 
 
-@user.route('/reset-password', methods=['GET', 'POST'])
+@user.route('/send-email-reset-password', methods=['GET', 'POST'])
+def send_email_reset_password():
+    return render_template('send-email-reset-password.html')
 
-def reset_password():
-    return render_template('reset-password.html')
+
+@user.route('/reset-password-by-email', methods=['POST'])
+def reset_password_by_email():
+    if request.method == 'POST' and Account.email_validation(request.json):
+        response = request.json
+        EmailSender.send_password_reset_email(user_email=response['email'])
+        return '', 200
+
+
+@user.route('/reset-password/<user_email>', methods=['GET', 'PUT'])
+def reset_password(user_email):
+    if 'reset_password' not in session:
+        return redirect(url_for('user.user_login'))
+
+    if request.method == 'PUT' and Account.email_validation(request.json):
+        response = request.json
+        user_to_update = User.get_user_by_email(user_email)
+        save_properties = SaveProperties(user_to_update.id)
+        save_properties.set_new_password(response['new_password'])
+        session.pop('reset_password')
+        return '', 200
+
+    return render_template('reset-password.html', user_email=user_email)

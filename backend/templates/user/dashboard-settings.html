@@ -114,7 +114,7 @@
                                 </div>
                                 <div class="mt-2 d-flex flex-column gap-2">
                                     <p>Can't remember your current password?</p>
-                                    <a href="{{ url_for('user.reset_password') }}" class="link-color">Reset your password</a>
+                                    <a href="{{ url_for('user.send_email_reset_password') }}" class="link-color">Reset your password</a>
                                     <div class="save-password d-flex gap-3 pt-2 align-items-center">
                                         <button type="button" class="btn btn-color-green mt-2 btn-password">Save Password</button>
                                     </div>
@@ -181,7 +181,7 @@
                         $('.alert-custom').fadeOut(500, function () {
                             $(this).remove();
                         });
-                    }, 1000);
+                    }, 2000);
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     if (jqXHR.status == 400) {
@@ -191,7 +191,7 @@
                             $('.alert-custom-danger').fadeOut(500, function () {
                                 $(this).remove();
                             });
-                        }, 1000);
+                        }, 2000);
                     }
                 }
             });

@@ -21,9 +21,15 @@
                                 {% for category, messege in messeges %}
                                     <li style="list-style: none">
                                         {% if messege == 'Expired token' or messege == 'Invalid token' %}
-                                            <div class="alert alert-{{ category }}" role="alert">
-                                                <a href="{{ url_for('resend_confirmation_email', user_email=request.args.get('user_email'), user_id=request.args.get('id_user')) }}">{{ messege }}, Confirm your email again</a>
-                                            </div>
+                                            {% if request.args.get('salt') and request.args.get('salt') == 'reset-password' %}
+                                                <div class="alert alert-{{ category }}" role="alert">
+                                                    <a href="{{ url_for('user.send_email_reset_password') }}" class="nav-link">{{ messege }}, reset your password again </a>
+                                                </div>
+                                            {% else %}
+                                                <div class="alert alert-{{ category }}" role="alert">
+                                                    <a href="{{ url_for('email.resend_confirmation_email', user_email=request.args.get('user_email')) }}" class="nav-link">{{ messege }}, Confirm your email again</a>
+                                                </div>
+                                            {% endif %}
                                         {% else %}
                                             <div class="alert alert-{{ category }}" role="alert">
                                                 {{ messege }}

@@ -1,4 +1,4 @@
-from flask import url_for, flash
+from flask import url_for, flash, g
 from flask_mail import Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 

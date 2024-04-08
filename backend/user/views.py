@@ -116,8 +116,8 @@ def reset_password_by_email():
         return '', 200
 
 
-@user.route('/reset-password/<user_email>', methods=['GET', 'PUT'])
-def reset_password(user_email):
+@user.route('/reset-password/<token>/<user_email>', methods=['GET', 'PUT'])
+def reset_password(token, user_email):
     if 'reset_password' not in session:
         return redirect(url_for('user.user_login'))
 

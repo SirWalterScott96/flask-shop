@@ -1,12 +1,26 @@
-def removeDuplicates(nums: list[int]) -> int:
-    comp = 0
-    pos = 1
-    for i in range(1, len(nums)):
-        if nums[comp] != nums[i]:
-            nums[pos], nums[i] = nums[i], nums[pos]
-            comp = pos
-            pos += 1
-    return len(set(nums))
+from flask import Flask, request, redirect, url_for
 
+app = Flask(__name__)
 
-print(removeDuplicates([0, 0, 1, 1, 1, 2, 2, 3, 3, 4]))
+# Головна сторінка
+@app.route('/')
+def index():
+    return 'Welcome to the main page!'
+
+# Перша сторінка
+@app.route('/page1')
+def page1():
+    return 'This is page 1 <a href="/page2">Go to page 2</a>'
+
+# Друга сторінка
+@app.route('/page2')
+def page2():
+    # Перевірка, чи є referrer
+    referrer = request.referrer
+    if referrer:
+        return f'You came from: {referrer}'
+    else:
+        return 'You came directly to this page'
+
+if __name__ == '__main__':
+    app.run(debug=True)

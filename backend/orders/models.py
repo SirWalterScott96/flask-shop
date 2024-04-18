@@ -57,6 +57,16 @@ class Orders(db.Model):
                 order_quantities_dict[order.id].append(quantity)
         return order_quantities_dict
 
+    @staticmethod
+    def set_new_status(order_id, status):
+        order = Orders.query.filter_by(id=order_id).first()
+        if order:
+            order.status = status
+            db.session.commit()
+            return 'success'
+        else:
+            return 'fail'
+
     def __repr__(self):
         return f"Orders('{self.name}', '{self.email}', '{self.phone_number}', '{self.street}', '{self.house_number}'," \
                f" '{self.entrance_number}', '{self.comment}', '{self.total_price}')"

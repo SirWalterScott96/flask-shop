@@ -206,4 +206,14 @@ def add_admin():
 def orders():
     all_orders = Orders.get_all_orders()
     get_all_orders_products_data = Orders.get_all_orders_products_data()
-    return render_template('orders.html', orders=all_orders, order_quantities_dict=get_all_orders_products_data)
+    return render_template('orders.html', orders=all_orders,
+                           order_quantities_dict=get_all_orders_products_data)
+
+@admin.route('/orders/update-status', methods=['PATCH'])
+@only_admin_access
+def update_status():
+    if request.method == 'PATCH' and request.json:
+        response = request.json
+        status_to_update = Orders.set_new_status(response['order_id'], response['status'])
+        return status_to_update
+    return '', 400

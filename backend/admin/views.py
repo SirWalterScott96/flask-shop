@@ -11,6 +11,7 @@ from backend.product.models import Categories, Subcategory, Products
 from backend.product.image_utils import ImageProduct
 from backend.extensions import db
 from backend.settings import Config
+from ..orders.models import Orders
 
 admin = Blueprint('admin', __name__, template_folder='../templates/admin')
 
@@ -18,10 +19,12 @@ admin = Blueprint('admin', __name__, template_folder='../templates/admin')
 def only_admin_access(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        if current_user.is_active and uuid.UUID(str(current_user.id)):
-            return func(*args, **kwargs)
-        else:
+        try:
+            if current_user.is_active and uuid.UUID(str(current_user.id)):
+                return func(*args, **kwargs)
+        except ValueError:
             return redirect(url_for('public.home'))
+
     return wrapper
 
 
@@ -34,7 +37,7 @@ def home():
 
     categories = Categories.query.all()
 
-    return render_template('admin.html', categories=categories,
+    return render_template('home.html', categories=categories,
                            categories_form=categories_form,
                            product_form=product_form,
                            sub_categories_form=sub_categories_form)
@@ -194,5 +197,13 @@ def add_admin():
         db.session.add(new_admin)
         db.session.commit()
 
-        return redirect(url_for('add_admin'))
+        return redirect(url_for('admin.add_admin'))
     return render_template('paneladmin-admins.html', form=form, admins=admins)
+
+
+@admin.route('/orders', methods=['GET', 'POST'])
+@only_admin_access
+def orders():
+    all_orders = Orders.get_all_orders()
+    get_all_orders_products_data = Orders.get_all_orders_products_data()
+    return render_template('orders.html', orders=all_orders, order_quantities_dict=get_all_orders_products_data)

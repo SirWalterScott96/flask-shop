@@ -93,7 +93,11 @@
                                         <td>{{ order.products|length }}</td>
                                         <td>{{ order.total_price }}</td>
                                         <td>In process</td>
-                                        <td><button class="btn btn-color-green" data-toggle="collapse" data-target="#orderDetails{{ order.id }}">See Details</button></td>
+                                        <td>
+                                            <button class="btn btn-color-green" data-toggle="collapse"
+                                                    data-target="#orderDetails{{ order.id }}">See Details
+                                            </button>
+                                        </td>
                                     </tr>
                                     <tr id="orderDetails{{ order.id }}" class="collapse">
                                         <td colspan="6">
@@ -123,7 +127,7 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 {% endblock %}

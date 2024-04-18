@@ -57,8 +57,8 @@ input[type='checkbox']:checked{
   font-size: 20px;
   cursor: pointer;
   position: absolute;
-  right: 2px;
-  top: 5px;
+  right: 9px;
+  top: 12px;
 }
 
 .list-group-item {

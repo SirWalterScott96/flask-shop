@@ -1,3 +1,4 @@
+from collections import defaultdict
 from urllib.parse import parse_qs
 from datetime import datetime
 from flask_login import current_user
@@ -24,12 +25,37 @@ class Orders(db.Model):
     total_price = db.Column(db.Float, nullable=False)
     order_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
     products = db.relationship('Products', secondary=orders_products, backref='orders', lazy=True)
+    status = db.Column(db.String(100), nullable=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
 
     @staticmethod
     def get_all_user_orders(user):
         pass
+
+    @staticmethod
+    def get_all_orders():
+        return Orders.query.order_by(Orders.order_time.desc()).all()
+
+    @staticmethod
+    def get_quantity_dict(user) -> dict:
+        order_quantities_dict = defaultdict(list)
+        for order in user.orders:
+            for product in order.products:
+                quantity = db.session.query(orders_products.c.quantity).filter_by(order_id=order.id,
+                                                                                  product_id=product.id).scalar()
+                order_quantities_dict[order.id].append(quantity)
+        return order_quantities_dict
+
+    @staticmethod
+    def get_all_orders_products_data():
+        order_quantities_dict = defaultdict(list)
+        for order in Orders.get_all_orders():
+            for product in order.products:
+                quantity = db.session.query(orders_products.c.quantity).filter_by(order_id=order.id,
+                                                                                  product_id=product.id).scalar()
+                order_quantities_dict[order.id].append(quantity)
+        return order_quantities_dict
 
     def __repr__(self):
         return f"Orders('{self.name}', '{self.email}', '{self.phone_number}', '{self.street}', '{self.house_number}'," \

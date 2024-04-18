@@ -70,15 +70,9 @@ def dashboard_settings():
 @user.route('/dashboard/orders')
 @login_required
 def dashboard_orders():
-    order_quantities_dict = defaultdict(list)
-    for order in current_user.orders:
-        products = order.products
-        for product in products:
-            quantity = db.session.query(orders_products.c.quantity).filter_by(order_id=order.id,
-                                                                              product_id=product.id).scalar()
-            order_quantities_dict[order.id].append(quantity)
+    get_orders_quantity_dict = Orders.get_quantity_dict(current_user)
 
-    return render_template('dashboard-orders.html', order_quantities_dict=order_quantities_dict)
+    return render_template('dashboard-orders.html', order_quantities_dict=get_orders_quantity_dict)
 
 
 @user.route('/set-account-details', methods=['PUT'])

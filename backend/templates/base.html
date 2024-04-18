@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshCard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
       integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -105,7 +106,7 @@
                         {% endif %}
                         <li class="px-1 mx-2"><a href="#" class="px-4 py-2">Forgot Password</a></li>
                         <li class="px-1 mx-2">
-                            <a href="#" class="px-4 py-2 d-flex align-items-center gap-1 menu">My Account
+                            <a href="{{ url_for('user.dashboard_orders') }}" class="px-4 py-2 d-flex align-items-center gap-1 menu">My Account
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                                     <path fill="black" d="m13.172 12l-4.95-4.95l1.414-1.413L16 12l-6.364 6.364l-1.414-1.415z"/>
                                 </svg>

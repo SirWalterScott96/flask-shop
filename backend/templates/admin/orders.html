@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/fontawesome.min.css"
+          integrity="sha384-BY+fdrpOd3gfeRvTSMT+VUZmA728cfF9Z2G42xpaRkUGu2i3DyzpTURDo5A6CaLK" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+<!--  Navbar  -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Admin Panel</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="{{ url_for('admin.home') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin.add_admin') }}">Admins</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('admin.orders') }}">Orders</a>
+                </li>
+            </ul>
+        </div>
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="{{ url_for('user.logout') }}">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<main>
+    <div class="container">
+         <h2 class="mt-4 mb-3">Orders</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Phone number</th>
+                    <th>Order time</th>
+                    <th>Items</th>
+                    <th>Total price</th>
+                    <th>Status</th>
+                    <th>Details</th>
+                </tr>
+
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.name }}</td>
+                        <td>{{ order.phone_number }}</td>
+                        <td>{{ order.order_time.strftime('%d-%m-%Y') }}</td>
+                        <td>{{ order.products|length }}</td>
+                        <td>{{ order.total_price }} UAH</td>
+                        <td>
+                            <select class="form-control status-select {% if order.status == 'in_process' %}bg-primary text-white{% elif order.status == 'delivered' %}bg-success text-white{% elif order.status == 'declined' %}bg-danger{% endif %}" data-order-id="{{ order.id }}">
+                                <option value="empty" class="text-dark bg-light"  {% if order.status == "empty" %} selected {% endif %}>Empty</option>
+                                <option value="in_process" class="text-dark bg-light"  {% if order.status == "in_process" %} selected {% endif %}>In process</option>
+                                <option value="delivered" class="text-dark bg-light"  {% if order.status == "delivered" %} selected {% endif %}>Delivered</option>
+                                <option value="declined" class="text-dark bg-light"  {% if order.status == "declined" %} selected {% endif %}>Declined</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="btn btn-color-green" data-toggle="collapse"
+                                    data-target="#orderDetails{{ order.id }}">
+                                See Details
+                            </button>
+                        </td>
+                    </tr>
+                    <tr id="orderDetails{{ order.id }}" class="collapse">
+                        <td colspan="8">
+                            <div class="mb-3">
+                                <h6><strong>Delivery Address</strong></h6>
+                                <p>{{ order.street }}, {{ order.house_number }}/{{ order.entrance_number }}</p>
+                            </div>
+                            <div class="px-4">
+                                {% for product in order.products %}
+                                    <div class="d-flex flex-column">
+                                        <h5>{{ product.name }}</h5>
+                                        <div class="d-flex justify-content-between pb-3">
+                                            <p>Price: {{ product.price }} UAH</p>
+                                            <p>Total Price: {{ product.price * order_quantities_dict[order.id][loop.index0] }} UAH</p>
+                                            <p>Quantity: {{ order_quantities_dict[order.id][loop.index0] }}</p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.status-select').change(function () {
+            var newStatus = $(this).val();
+            var statusCell = $(this).closest('td');
+            statusCell.removeClass('bg-primary bg-success bg-danger');
+
+            if (newStatus === 'in_process') {
+                newStatus.addClass('bg-primary');
+            } else if (newStatus === 'delivered') {
+                statusCell.addClass('bg-success');
+            } else if (newStatus === 'declined') {
+                statusCell.addClass('bg-danger');
+            }
+        });
+    });
+</script>
+</body>
+</html>

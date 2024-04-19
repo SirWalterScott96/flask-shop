@@ -17,7 +17,7 @@ class Config:
     UPLOAD_EXTENSIONS = ["jpg", "png"]
     REMEMBER_COOKIE_DURATION = timedelta(days=3)
     UPLOAD_FOLDER_PRODUCT_IMGS = APP_DIR / 'static' / 'product_imgs'
-    UPLOAD_FOLDER_SUBCATEGORY_IMGS = os.path.join(APP_DIR, 'static/subcategory_imgs')
+    UPLOAD_FOLDER_SUBCATEGORY_IMGS = APP_DIR / 'static' / 'subcategory_imgs'
 
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{APP_DIR / 'instance' / 'database.db'}"
     MIGRATIONS_FOLDER = APP_DIR / 'migrations'

@@ -124,7 +124,8 @@ class CreateOrder(Orders):
             entrance_number=self.entrance_number,
             comment=self.comment,
             total_price=self.total_price,
-            user_id=current_user.id if current_user.is_active else None
+            user_id=current_user.id if current_user.is_active else None,
+            status='in_process'
         )
 
         db.session.add(self.new_order)

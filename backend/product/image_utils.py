@@ -21,7 +21,7 @@ class Image:
         self.image_data.save(self.path)
 
     def img_url(self):
-        return f'product_imgs/{self.name}'
+        return f'{self.path.name}/{self.name}'
 
 
 class ImageProduct(Image):
@@ -32,8 +32,3 @@ class ImageProduct(Image):
 class ImageSubcategory(Image):
     def __init__(self, image_data):
         super().__init__(image_data, Config.UPLOAD_FOLDER_SUBCATEGORY_IMGS)
-
-
-if __name__ == '__main__':
-    test = ImageProduct()
-    print(test.path())

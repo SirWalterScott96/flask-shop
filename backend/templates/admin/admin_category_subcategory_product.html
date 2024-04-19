@@ -1,41 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-</head>
-<body>
-<!--  Navbar  -->
-<nav class="navbar navbar-expand-lg navbar-dark green-color">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">Admin Panel</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="{{ url_for('admin.home') }}">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="{{ url_for('admin.add_admin') }}">Admins</a>
-                </li>
-            </ul>
-        </div>
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="{{ url_for('user.logout') }}">Logout</a>
-            </li>
-        </ul>
-    </div>
-</nav>
-
+{% extends 'admin-base.html' %}
+{% block content %}
 <div class="modal" tabindex="-1" id="myModal-2">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -66,14 +30,14 @@
     <h1>Hi {{ current_user.name }}!</h1>
     <div class="row">
         <div class="col-3">
-            <h3 class="">Categories</h3>
+            <h3 class="mb-4">Categories</h3>
 
         <!-- Nav Bar Left -->
             <ul class="nav nav-category">
                 {% for category in categories %}
-                    <li class="nav-item border-bottom w-100 mb-1">
+                    <li class="nav-item border-bottom w-100 mb-3">
                         <div class="d-flex justify-content-between align-items-center ">
-                            <a href="{{ url_for('admin.show_subcategories', category_id=category.id) }}" class="category-link">{{ category.name }}</a>
+                            <a href="{{ url_for('admin.show_subcategories', category_id=category.id) }}" class="category-link mb-2">{{ category.name }}</a>
                             <i class="toggle-icon fas fa-chevron-down" data-bs-toggle="collapse" data-bs-target="#category-{{ category.id }}" style="cursor: pointer"></i>
                         </div>
 
@@ -85,9 +49,9 @@
 
                         {% for subcategory in category.sub_category %}
                             {% if subcategory.id == subcategory_id %}
-                                <div class="list-group-item link-weight border-bottom"><a href="{{ url_for('admin.show_products', category_id=subcategory.category_id, subcategory_id=subcategory.id) }}" class="category-link-small color-active">{{ subcategory.name }}</a></div>
+                                <div class="list-group-item link-weight"><a href="{{ url_for('admin.show_products', category_id=subcategory.category_id, subcategory_id=subcategory.id) }}" class="category-link-small color-active">{{ subcategory.name }}</a></div>
                             {% else %}
-                                <div class="list-group-item link-weight border-bottom"><a href="{{ url_for('admin.show_products', category_id=subcategory.category_id, subcategory_id=subcategory.id) }}" class="category-link-small">{{ subcategory.name }}</a></div>
+                                <div class="list-group-item link-weight"><a href="{{ url_for('admin.show_products', category_id=subcategory.category_id, subcategory_id=subcategory.id) }}" class="category-link-small">{{ subcategory.name }}</a></div>
                             {% endif %}
 
                         {% endfor %}
@@ -111,7 +75,7 @@
                                     <div class="modal-body">
                                         {{ sub_categories_form.name(class="form-control mb-1 input-active", placeholder="Enter a subcategories title") }}
                                         {{ sub_categories_form.img_upload(class="form-control mb-1 input-active") }}
-
+                                        <div id="imgHelp" class="form-text">Image size should be 450x450 px</div>
                                     </div>
 
                                     <div class="modal-footer">
@@ -209,7 +173,8 @@
         </div>
     </div>
 </div>
-
+{% endblock %}
+{% block scripts %}
 <script>
 $(document).ready(function(){
         var fields = ['card-name', 'card-description', 'card-price', 'card-quantity'];
@@ -297,5 +262,4 @@ $(document).ready(function(){
         });
 });
 </script>
-</body>
-</html>
+{% endblock %}

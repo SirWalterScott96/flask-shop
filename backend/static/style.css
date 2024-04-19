@@ -550,3 +550,7 @@ tbody tr {
 td, th {
     vertical-align: middle;
 }
+
+.modal-header .btn-close {
+  margin: 0 !important;
+}

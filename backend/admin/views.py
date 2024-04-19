@@ -1,4 +1,4 @@
-from flask import redirect, url_for, Blueprint, render_template, flash, abort, jsonify, session, request
+from flask import redirect, url_for, Blueprint, render_template, abort, jsonify, session, request
 from flask_login import current_user, login_user
 import uuid
 from functools import wraps
@@ -8,10 +8,11 @@ from .models import Admin
 from .forms import AdminLoginForm, AdminRegisterForm
 from backend.product.forms import CategoriesForm, ProductForm, SubCategoryForm
 from backend.product.models import Categories, Subcategory, Products
-from backend.product.image_utils import ImageProduct
+from backend.product.image_utils import ImageProduct, ImageSubcategory
 from backend.extensions import db
 from backend.settings import Config
-from ..orders.models import Orders
+from backend.orders.models import Orders
+
 
 admin = Blueprint('admin', __name__, template_folder='../templates/admin')
 
@@ -28,9 +29,10 @@ def only_admin_access(func):
     return wrapper
 
 
-@admin.route('/')
+@admin.route('/home')
 @only_admin_access
 def home():
+    """Home page."""
     categories_form = CategoriesForm()
     product_form = ProductForm()
     sub_categories_form = SubCategoryForm()
@@ -55,9 +57,10 @@ def login():
     return render_template('admin-login.html', form=form)
 
 
-@admin.route('/category-<category_id>')
+@admin.route('/home/category-<category_id>')
 @only_admin_access
 def show_subcategories(category_id):
+    """Show subcategories of category."""
     categories_form = CategoriesForm()
     sub_categories_form = SubCategoryForm()
 
@@ -70,9 +73,10 @@ def show_subcategories(category_id):
                            subcategories_in_category=subcategories_in_category)
 
 
-@admin.route('/category-<category_id>/subcategory-<subcategory_id>')
+@admin.route('/home/category-<category_id>/subcategory-<subcategory_id>')
 @only_admin_access
 def show_products(category_id, subcategory_id):
+    """Show all products for a category."""
     categories_form = CategoriesForm()
     sub_categories_form = SubCategoryForm()
     product_form = ProductForm()
@@ -92,6 +96,7 @@ def show_products(category_id, subcategory_id):
 @admin.route('/create-category', methods=['POST'])
 @only_admin_access
 def create_category():
+    """Create new category."""
     categories_form = CategoriesForm()
 
     if categories_form.validate_on_submit():
@@ -106,17 +111,16 @@ def create_category():
 @admin.route('/create-subcategory', methods=['POST'])
 @only_admin_access
 def create_subcategory():
+    """Create new subcategory."""
     form = SubCategoryForm()
     if form.validate_on_submit():
         category_id = form.hidden_tag_id.data
-        image = form.img_upload.data
-        image_name = str(uuid.uuid4()) + '_' + secure_filename(image.filename)
-        image_path = os.path.join(Config.UPLOAD_FOLDER_SUBCATEGORY_IMGS, image_name)
-        image.save(image_path)
+        image = ImageSubcategory(form.img_upload.data)
+        image.save_img()
 
         new_subcategory = Subcategory(name=form.name.data,
                                       category_id=category_id,
-                                      img_url='subcategory_imgs/{}'.format(image_name))
+                                      img_url=image.img_url())
 
         db.session.add(new_subcategory)
         db.session.commit()
@@ -204,14 +208,17 @@ def add_admin():
 @admin.route('/orders', methods=['GET', 'POST'])
 @only_admin_access
 def orders():
+    """Get all orders."""
     all_orders = Orders.get_all_orders()
     get_all_orders_products_data = Orders.get_all_orders_products_data()
     return render_template('orders.html', orders=all_orders,
                            order_quantities_dict=get_all_orders_products_data)
 
+
 @admin.route('/orders/update-status', methods=['PATCH'])
 @only_admin_access
 def update_status():
+    """Update order status."""
     if request.method == 'PATCH' and request.json:
         response = request.json
         status_to_update = Orders.set_new_status(response['order_id'], response['status'])

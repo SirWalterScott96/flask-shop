@@ -1,37 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Panel</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</head>
-<body>
-<!--  Navbar  -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">Admin Panel</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="{{ url_for('admin.home') }}">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" href="{{ url_for('admin.add_admin') }}">Admins</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Orders</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">Add new admin</button>
+{% extends 'admin-base.html' %}
+{% block content %}
+<div class="container">
+    <button type="button" class="btn btn-color-green my-3" data-bs-toggle="modal" data-bs-target="#myModal">Add new admin</button>
     <div class="modal" tabindex="-1" id="myModal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -39,18 +9,18 @@
                     {{ form.csrf_token }}
                     <div class="modal-header">
                         <h5 class="modal-title">Add new admin</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close mr-2" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
                     <div class="modal-body">
-                        {{ form.name(class="form-control",placeholder="Write a name") }}
-                        {{ form.username(class="form-control",placeholder="Write a username") }}
-                        {{ form.password(class="form-control",placeholder="Write a password") }}
-                        {{ form.role(class="form-select") }}
+                        {{ form.name(class="form-control mb-2",placeholder="Write a name") }}
+                        {{ form.username(class="form-control mb-2",placeholder="Write a username") }}
+                        {{ form.password(class="form-control mb-2",placeholder="Write a password") }}
+                        {{ form.role(class="form-select mb-2") }}
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Create</button>
+                        <button type="submit" class="btn btn-color-green">Create</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </form>
@@ -74,5 +44,5 @@
       {% endfor %}
       </tbody>
     </table>
-</body>
-</html>
+</div>
+{% endblock %}

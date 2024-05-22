@@ -1,0 +1,10 @@
+version: '3'
+services:
+  web:
+    image: python:3.9
+    container_name: flask-shop
+    volumes:
+      - ./.:/web
+    command: sh -c 'pip install -r /web/requirements && python web/app.py'
+    ports:
+      - '81:5000'

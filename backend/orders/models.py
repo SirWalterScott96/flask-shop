@@ -91,6 +91,7 @@ class CreateOrder(Orders):
         self.comment = form_data.get('comment')[0] if 'comment' in form_data else ''
         self.product_dict = self.get_products_list()
         self.total_price = self.total_price_product()
+        self.status = 'in process'
 
     def get_form_from_data(self):
         return parse_qs(self.request_data['formData'])

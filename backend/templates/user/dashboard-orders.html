@@ -92,7 +92,11 @@
                                         <td>{{ order.order_time.strftime('%d-%m-%Y') }}</td>
                                         <td>{{ order.products|length }}</td>
                                         <td>{{ order.total_price }}</td>
-                                        <td>In process</td>
+                                        <td>
+                                            <div class="text-center py-2 {% if order.status == 'in process' %}bg-primary text-white{% elif order.status == 'delivered' %}bg-success text-white{% elif order.status == 'declined' %}bg-danger text-white{% endif %}">
+                                                {{ order.status }}
+                                            </div>
+                                        </td>
                                         <td>
                                             <button class="btn btn-color-green" data-toggle="collapse"
                                                     data-target="#orderDetails{{ order.id }}">See Details

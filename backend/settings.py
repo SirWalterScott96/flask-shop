@@ -6,7 +6,7 @@ from datetime import timedelta
 from flask.helpers import get_debug_flag
 from pathlib import Path
 
-load_dotenv()
+load_dotenv(dotenv_path='../.env')
 
 
 class Config:
@@ -19,8 +19,10 @@ class Config:
     UPLOAD_FOLDER_PRODUCT_IMGS = APP_DIR / 'static' / 'product_imgs'
     UPLOAD_FOLDER_SUBCATEGORY_IMGS = APP_DIR / 'static' / 'subcategory_imgs'
 
+    #Database
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{APP_DIR / 'instance' / 'database.db'}"
     MIGRATIONS_FOLDER = APP_DIR / 'migrations'
+
     # Mail
     MAIL_SERVER = os.getenv('MAIL_SERVER')
     MAIL_PORT = os.getenv('MAIL_PORT')

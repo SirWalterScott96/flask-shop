@@ -28,9 +28,9 @@
                         <td>{{ order.products|length }}</td>
                         <td>{{ order.total_price }} UAH</td>
                         <td>
-                            <select class="form-control status-select {% if order.status == 'in_process' %}bg-primary text-white{% elif order.status == 'delivered' %}bg-success text-white{% elif order.status == 'declined' %}bg-danger text-white{% endif %}" data-order-id="{{ order.id }}">
+                            <select class="form-control status-select {% if order.status == 'in process' %}bg-primary text-white{% elif order.status == 'delivered' %}bg-success text-white{% elif order.status == 'declined' %}bg-danger text-white{% endif %}" data-order-id="{{ order.id }}">
                                 <option value="empty" class="text-dark bg-light"  {% if order.status == "empty" %} selected {% endif %}>Empty</option>
-                                <option value="in_process" class="text-dark bg-light"  {% if order.status == "in_process" %} selected {% endif %}>In process</option>
+                                <option value="in process" class="text-dark bg-light"  {% if order.status == "in process" %} selected {% endif %}>In process</option>
                                 <option value="delivered" class="text-dark bg-light"  {% if order.status == "delivered" %} selected {% endif %}>Delivered</option>
                                 <option value="declined" class="text-dark bg-light"  {% if order.status == "declined" %} selected {% endif %}>Declined</option>
                             </select>

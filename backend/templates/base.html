@@ -91,7 +91,7 @@
                 <li><a href="#" class="nav-item-custom active-color">Contacts</a></li>
                 <li><a href="#" class="nav-item-custom active-color">Payment and delivery</a></li>
                 <li><a href="#" class="nav-item-custom active-color">About Us</a></li>
-                <li><a href="#" class="nav-item-custom active-color menu d-flex align-items-center gap-1">
+                <li><a href="{{ url_for('user.dashboard_orders') }}" class="nav-item-custom active-color menu d-flex align-items-center gap-1">
                     Account
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                         <path fill="none" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m7 10l5 5m0 0l5-5"/>
@@ -104,7 +104,7 @@
                             <li class="px-1 mx-2"><a href="{{ url_for('user.user_login') }}" class="px-4 py-2">Sign in</a></li>
                             <li class="px-1 mx-2"><a href="{{ url_for('user.user_register') }}" class="px-4 py-2">Sign up</a></li>
                         {% endif %}
-                        <li class="px-1 mx-2"><a href="#" class="px-4 py-2">Forgot Password</a></li>
+                        <li class="px-1 mx-2"><a href="{{ url_for('user.send_email_reset_password') }}" class="px-4 py-2">Forgot Password</a></li>
                         <li class="px-1 mx-2">
                             <a href="{{ url_for('user.dashboard_orders') }}" class="px-4 py-2 d-flex align-items-center gap-1 menu">My Account
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">

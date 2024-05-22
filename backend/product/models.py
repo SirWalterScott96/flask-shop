@@ -40,6 +40,10 @@ class Products(db.Model):
 
         db.session.commit()
 
+    @staticmethod
+    def set_quantity_from_order_status(self, order):
+        raise NotImplementedError
+
     def __str__(self):
         return self.name
 

@@ -7,12 +7,12 @@ from .forms import OrderForm
 orders = Blueprint('orders', __name__, template_folder='../templates/orders')
 
 
-@orders.route('/')
+@orders.route('/cart')
 def cart():
     if 'cart' in session:
         g.cart: dict = {Products.query.filter_by(id=int(data['product_id'])).first(): data['quantity']
                         for name, data in session['cart'].items()}
-    return render_template('orders.html')
+    return render_template('orders/orders.html')
 
 
 @orders.route('/add-to-cart', methods=['POST'])

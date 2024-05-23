@@ -6,11 +6,11 @@ from datetime import timedelta
 from flask.helpers import get_debug_flag
 from pathlib import Path
 
-load_dotenv(dotenv_path='../.env')
+APP_DIR = Path(__file__).parent
+load_dotenv(dotenv_path=APP_DIR.parent / '.env')
 
 
 class Config:
-    APP_DIR = Path(__file__).parent
     ENV = "dev"
     SECRET_KEY = os.getenv('SECRET_KEY')
     FLASK_DEBUG = get_debug_flag()

@@ -18,7 +18,7 @@ def init_admin():
         repeat_password: str = getpass('Repeat your password: ')
 
         if not password == repeat_password:
-            return
+            return print('Passwords do not match.')
 
         Admin.create_admin(name, username, password)
 

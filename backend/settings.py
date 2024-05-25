@@ -14,7 +14,7 @@ class Config:
     ENV = "dev"
     SECRET_KEY = os.getenv('SECRET_KEY')
     FLASK_DEBUG = get_debug_flag()
-    UPLOAD_EXTENSIONS = ["jpg", "png"]
+    UPLOAD_EXTENSIONS = ['jpg', 'png', 'JPG']
     REMEMBER_COOKIE_DURATION = timedelta(days=3)
     UPLOAD_FOLDER_PRODUCT_IMGS = APP_DIR / 'static' / 'product_imgs'
     UPLOAD_FOLDER_SUBCATEGORY_IMGS = APP_DIR / 'static' / 'subcategory_imgs'

@@ -6,8 +6,8 @@ from backend.settings import Config
 class Image:
 
     def __init__(self, image_data, directory):
-        self.directory = directory
         self.image_data = image_data
+        self.directory = directory
         self.name = self.secure_name(self.image_data)
         self.path = self.img_path()
 
@@ -21,7 +21,7 @@ class Image:
         self.image_data.save(self.path)
 
     def img_url(self):
-        return f'{self.path.name}/{self.name}'
+        return f'{self.directory.name}/{self.name}'
 
 
 class ImageProduct(Image):
@@ -32,3 +32,4 @@ class ImageProduct(Image):
 class ImageSubcategory(Image):
     def __init__(self, image_data):
         super().__init__(image_data, Config.UPLOAD_FOLDER_SUBCATEGORY_IMGS)
+

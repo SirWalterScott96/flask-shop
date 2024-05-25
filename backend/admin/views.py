@@ -117,6 +117,7 @@ def create_subcategory():
         category_id = form.hidden_tag_id.data
         image = ImageSubcategory(form.img_upload.data)
         image.save_img()
+        print(image.img_url())
 
         new_subcategory = Subcategory(name=form.name.data,
                                       category_id=category_id,
@@ -125,8 +126,8 @@ def create_subcategory():
         db.session.add(new_subcategory)
         db.session.commit()
 
-        return redirect(url_for('admin_show_subcategories', category_id=category_id))
-    return redirect(url_for('admin_show_subcategories'))
+        return redirect(url_for('admin.show_subcategories', category_id=category_id))
+    return redirect(url_for('admin_show.subcategories'))
 
 
 @admin.route('/create-product/<category_id>/<subcategory_id>', methods=['POST'])

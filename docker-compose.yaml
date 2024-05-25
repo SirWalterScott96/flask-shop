@@ -7,4 +7,4 @@ services:
       - ./.:/web
     command: sh -c 'pip install -r /web/requirements && python /web/app.py'
     ports:
-      - '81:5000'
+      - '5000:5000'

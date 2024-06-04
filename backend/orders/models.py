@@ -25,7 +25,7 @@ class Orders(db.Model):
     total_price = db.Column(db.Float, nullable=False)
     order_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
     products = db.relationship('Products', secondary=orders_products, backref='orders', lazy=True)
-    status = db.Column(db.String(100), nullable=True)
+    status = db.Column(db.String(100), nullable=True, default='in_process')
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
 
@@ -91,7 +91,6 @@ class CreateOrder(Orders):
         self.comment = form_data.get('comment')[0] if 'comment' in form_data else ''
         self.product_dict = self.get_products_list()
         self.total_price = self.total_price_product()
-        self.status = 'in process'
 
     def get_form_from_data(self):
         return parse_qs(self.request_data['formData'])
@@ -126,7 +125,6 @@ class CreateOrder(Orders):
             comment=self.comment,
             total_price=self.total_price,
             user_id=current_user.id if current_user.is_active else None,
-            status='in_process'
         )
 
         db.session.add(self.new_order)

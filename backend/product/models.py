@@ -15,7 +15,7 @@ class Subcategory(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
     img_url = db.Column(db.String(200), nullable=False)
 
-    products = db.relationship('Products', backref='subcategory', lazy=True)
+    products = db.relationship('Products', backref='subcategory', cascade='all, delete', lazy=True)
 
 
 class Products(db.Model):

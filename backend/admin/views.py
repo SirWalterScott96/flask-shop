@@ -2,7 +2,6 @@ from flask import redirect, url_for, Blueprint, render_template, abort, jsonify,
 from flask_login import current_user, login_user
 import uuid
 from functools import wraps
-import os
 
 from .models import Admin
 from .forms import AdminLoginForm, AdminRegisterForm
@@ -10,7 +9,6 @@ from backend.product.forms import CategoriesForm, ProductForm, SubCategoryForm
 from backend.product.models import Categories, Subcategory, Products
 from backend.product.image_utils import ImageProduct, ImageSubcategory
 from backend.extensions import db
-from backend.settings import Config
 from backend.orders.models import Orders
 
 
@@ -182,8 +180,20 @@ def delete_product(product_id, category_id, subcategory_id):
     if product_to_delete:
         db.session.delete(product_to_delete)
         db.session.commit()
-    return redirect(url_for('admin_show_products', category_id=category_id, subcategory_id=subcategory_id))
+    return redirect(url_for('admin.show_products', category_id=category_id, subcategory_id=subcategory_id))
 
+
+@admin.route('/delete-subcategory/<category_id>/<subcategory_id>')
+@only_admin_access
+def delete_subcategory(category_id, subcategory_id):
+    """Delete the subcategory."""
+    subcategory_to_delete = Subcategory.query.filter_by(id=subcategory_id).first()
+
+    if subcategory_id:
+        db.session.delete(subcategory_to_delete)
+        db.session.commit()
+    return redirect(url_for('admin.show_subcategories', category_id=category_id))
+    
 
 @admin.route('/admin-panel/add-admin', methods=['GET', 'POST'])
 @only_admin_access

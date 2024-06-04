@@ -50,6 +50,7 @@
                         {% for subcategory in category.sub_category %}
                                 <div class="list-group-item link-weight">
                                     <a href="{{ url_for('admin.show_products', category_id=category.id, subcategory_id=subcategory.id) }}" class="category-link-small">{{ subcategory.name }}</a>
+
                                 </div>
                         {% endfor %}
 
@@ -97,14 +98,15 @@
             <div class="row row-cols-1 row-cols-md-3 g-4 mt-1">
                 {% for subcategory in subcategories_in_category.sub_category %}
                         <div class="col-md-3">
-                            <a href="{{ url_for('admin.show_products', category_id=subcategory.category_id, subcategory_id=subcategory.id) }}" class="product-link">
-                                <div class="card">
-                                    <div class="card-body">
+                            <div class="card">
+                                <a class="button btn-close inline" href="{{ url_for('admin.delete_subcategory', category_id=subcategory.category_id, subcategory_id=subcategory.id) }}"></a>
+                                <div class="card-body">
+                                    <a href="{{ url_for('admin.show_products', category_id=subcategory.category_id, subcategory_id=subcategory.id) }}" class="product-link">
                                         <img src="{{ url_for('static', filename=subcategory.img_url) }}" class="img-fluid mb-2" alt="...">
                                         <h5 class="card-title" style="text-align: center">{{ subcategory.name }}</h5>
-                                    </div>
+                                    </a>
                                 </div>
-                            </a>
+                            </div>
                         </div>
                 {% endfor %}
             </div>
